@@ -2430,6 +2430,26 @@ html.stk-gl #strip .stk-track{display:block;height:220vh}
 html.stk-gl #strip .stk-stage{position:sticky;top:60px;height:calc(100vh - 60px);overflow:hidden}
 #stkgl{position:absolute;inset:0;width:100%;height:100%;display:block}
 .stk-cap{position:absolute;left:0;right:0;bottom:28px;text-align:center;margin:0;font:600 15px/1.4 Inter,system-ui,sans-serif;letter-spacing:.04em;color:#f3efe6;text-shadow:0 1px 12px rgba(0,0,0,.6)}
+
+/* item 3: phone strip carousel (swipe, snap, position dots); desktop WebGL and print untouched */
+@media(max-width:767px){
+#strip .stk-static{display:flex!important;overflow-x:auto;overflow-y:hidden;scroll-snap-type:x mandatory;gap:14px;padding:36px 12vw 12px;margin:0;max-width:none;min-height:0!important;align-content:normal;overscroll-behavior-x:contain;touch-action:pan-x pan-y;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+#strip .stk-static::-webkit-scrollbar{display:none}
+#strip .stk-static li{flex:0 0 76vw;scroll-snap-align:center;scroll-snap-stop:always}
+#strip .stk-static img{max-height:none;width:100%}
+#strip .stk-static:focus-visible{outline:2px solid #f3efe6;outline-offset:-4px}
+#strip .stk-pos{display:flex;align-items:center;justify-content:center;gap:6px;padding:4px 0 28px;font:600 13px/1 Inter,system-ui,sans-serif;color:#f3efe6;font-variant-numeric:tabular-nums}
+#strip .stk-pos i{width:6px;height:6px;border-radius:3px;background:rgba(243,239,230,.35);transition:width .25s ease,background .25s ease}
+#strip .stk-pos i.on{width:20px;background:#f3efe6}
+#strip .stk-pos b{margin-left:10px;font-weight:600;opacity:.8}
+}
+@media(min-width:768px){#strip .stk-pos{display:none}}
+@media(max-width:767px) and (prefers-reduced-motion:no-preference){@supports(animation-timeline:view()){html:not(.calm) #strip .stk-static li{animation:stk-fo linear both;animation-timeline:view(inline);animation-range:entry 0% cover 50%}
+@keyframes stk-fo{from{opacity:.55;scale:.93}to{opacity:1;scale:1}}}}
+@media(prefers-reduced-motion:reduce){#strip .stk-pos i{transition:none}}
+@media print{#strip .stk-pos{display:none!important}#strip .stk-static{display:grid!important;overflow:visible!important}}
+/* item 4: connector fill follows scroll (class added by script only while scroll-driven) */
+#p-ni .ni-card.ni-sd .ni-fill,#p-ni .ni-card.ni-sd .ni-w .ni-fill{transition:none;transform:scaleX(var(--f,0));opacity:1}
 </style><style id="r31">@media(max-width:600px){html.js:not(.calm) body #top .art{scale:.9;transform-origin:50% 0;margin-bottom:56px}html body #top .art figure{box-shadow:0 8px 16px -10px rgba(14,43,51,.5)}}a:not(.btn):not(.cardlink){position:relative}a:not(.btn):not(.cardlink)::before{content:"";position:absolute;inset:-8px 0}</style></head><body>
 <a class="skip" href="#main">Skip to content</a>
 <header class="bar"><div class="wrap"><a class="brand" href="#top">Chris Clegg</a>
@@ -2709,7 +2729,7 @@ html.stk-gl #strip .stk-stage{position:sticky;top:60px;height:calc(100vh - 60px)
 
 <section id="match"><div class="wrap"><h2>What you asked for, and my proof.</h2>
 <p class="lede">Your advertisement lists seven duties and ten hours of Social Media Assistant cover. Here is each one, with what I have done.</p>
-<p class="mkey"><span class="mk" aria-hidden="true"></span> 4 shown with proof <span class="mk o" aria-hidden="true"></span> 4 not yet, said plainly</p><div class="duties" role="table" aria-label="Duties and proof"><div class="dh" role="row" aria-hidden="true"><span>Duty</span><span>What I did</span><span>Proof</span></div><div class="duty rv gap" role="row"><q role="cell">Creating and editing photography, videos, graphics and written content</q><p role="cell">I made the four pieces on this page: a reel, a cruise map, an 1840 timeline and a five⁠-⁠slide carousel. I have no photography to show yet.</p><a class="prf" role="cell" href="#p-carousel" data-go>The four pieces above</a></div><div class="duty rv" role="row"><q role="cell">Social media planning and allocated campaigns</q><p role="cell">I planned the content for Facebook and Instagram, at 400 posts a month across 16 countries.</p><a class="prf" role="cell" href="#facts" data-go>400 posts a month, 16 countries</a></div><div class="duty rv gap" role="row"><q role="cell">Updating website content, coordinating and uploading blogs</q><p role="cell">At New Image I made the images, podcast and YouTube video for each Hub article. I have not edited a website yet,.</p><a class="prf" role="cell" href="#p-ni" data-go>Images, podcast and video for each article</a></div><div class="duty rv" role="row"><q role="cell">Building and testing email newsletters in Mailchimp</q><p role="cell">I built 38 email campaigns in English, Bahasa Malaysia and Chinese from one set of content. I sent 31 between June and August using Moosend, a tool similar to Mailchimp.</p><a class="prf" role="cell" href="#p-ni" data-go>38 built, 31 sent, 20.5% opened</a></div><div class="duty rv gap" role="row"><q role="cell">Designing posters, flyers, vouchers, signage and internal communications</q><p role="cell">I have not made a poster yet. The carousel slides use the same layout skills, and I use Canva and Microsoft apps.</p><a class="prf" role="cell" href="#p-carousel" data-go>The carousel above</a></div><div class="duty rv" role="row"><q role="cell">Coordinating requests for images and promotional copy</q><p role="cell">I built a review app where the team checks posts, leaves notes and sends them back in one go.</p><a class="prf" role="cell" href="#software" data-go>The review app</a></div><div class="duty rv" role="row"><q role="cell">Supporting campaigns and providing continuity during team leave</q><p role="cell">I am available 40 hours a week, flexible from 32. I can start whenever suits you.</p><a class="prf" role="cell" href="#contact" data-go>40 hours a week, flexible from 32</a></div><div class="duty rv gap" role="row"><q role="cell">Social Media Assistant cover, 10 hours a week: planning, publishing, monitoring, reporting</q><p role="cell">I have planned and published Facebook and Instagram content, so I can cover the 10 hours. I have no reporting sample yet.</p><a class="prf" role="cell" href="#facts" data-go>Facebook and Instagram, June to October 2026</a></div></div></div></section>
+<p class="mkey"><span class="mk" aria-hidden="true"></span> 4 shown with proof <span class="mk o" aria-hidden="true"></span> 4 not yet, said plainly</p><div class="duties" role="table" aria-label="Duties and proof"><div class="dh" role="row" aria-hidden="true"><span>Duty</span><span>What I did</span><span>Proof</span></div><div class="duty rv gap" role="row"><q role="cell">Creating and editing photography, videos, graphics and written content</q><p role="cell">I made the four pieces on this page: a reel, a cruise map, an 1840 timeline and a five⁠-⁠slide carousel. I have no photography to show yet.</p><a class="prf" role="cell" href="#p-carousel" data-go>The four pieces above</a></div><div class="duty rv" role="row"><q role="cell">Social media planning and allocated campaigns</q><p role="cell">I planned the content for Facebook and Instagram, at 400 posts a month across 16 countries.</p><a class="prf" role="cell" href="#facts" data-go>400 posts a month, 16 countries</a></div><div class="duty rv gap" role="row"><q role="cell">Updating website content, coordinating and uploading blogs</q><p role="cell">At New Image I made the images, podcast and YouTube video for each Hub article. I have not edited a website yet.</p><a class="prf" role="cell" href="#p-ni" data-go>Images, podcast and video for each article</a></div><div class="duty rv" role="row"><q role="cell">Building and testing email newsletters in Mailchimp</q><p role="cell">I built 38 email campaigns in English, Bahasa Malaysia and Chinese from one set of content. I sent 31 between June and August using Moosend, a tool similar to Mailchimp.</p><a class="prf" role="cell" href="#p-ni" data-go>38 built, 31 sent, 20.5% opened</a></div><div class="duty rv gap" role="row"><q role="cell">Designing posters, flyers, vouchers, signage and internal communications</q><p role="cell">I have not made a poster yet. The carousel slides use the same layout skills, and I use Canva and Microsoft apps.</p><a class="prf" role="cell" href="#p-carousel" data-go>The carousel above</a></div><div class="duty rv" role="row"><q role="cell">Coordinating requests for images and promotional copy</q><p role="cell">I built a review app where the team checks posts, leaves notes and sends them back in one go.</p><a class="prf" role="cell" href="#software" data-go>The review app</a></div><div class="duty rv" role="row"><q role="cell">Supporting campaigns and providing continuity during team leave</q><p role="cell">I am available 40 hours a week, flexible from 32. I can start whenever suits you.</p><a class="prf" role="cell" href="#contact" data-go>40 hours a week, flexible from 32</a></div><div class="duty rv gap" role="row"><q role="cell">Social Media Assistant cover, 10 hours a week: planning, publishing, monitoring, reporting</q><p role="cell">I have planned and published Facebook and Instagram content, so I can cover the 10 hours. I have no reporting sample yet.</p><a class="prf" role="cell" href="#facts" data-go>Facebook and Instagram, June to October 2026</a></div></div></div></section>
 
 <section class="deep" id="flow"><div class="wrap"><span class="eyebrow">How I work</span><h2 aria-label="Plan, make, publish, measure."><span class="r29w"><span class="r29l" aria-hidden="true" style="--i:0;--r:-10">P</span><span class="r29l" aria-hidden="true" style="--i:1;--r:10">l</span><span class="r29l" aria-hidden="true" style="--i:2;--r:-10">a</span><span class="r29l" aria-hidden="true" style="--i:3;--r:10">n</span><span class="r29l" aria-hidden="true" style="--i:4;--r:-10">,</span></span> <span class="r29w"><span class="r29l" aria-hidden="true" style="--i:5;--r:10">m</span><span class="r29l" aria-hidden="true" style="--i:6;--r:-10">a</span><span class="r29l" aria-hidden="true" style="--i:7;--r:10">k</span><span class="r29l" aria-hidden="true" style="--i:8;--r:-10">e</span><span class="r29l" aria-hidden="true" style="--i:9;--r:10">,</span></span> <span class="r29w"><span class="r29l" aria-hidden="true" style="--i:10;--r:-10">p</span><span class="r29l" aria-hidden="true" style="--i:11;--r:10">u</span><span class="r29l" aria-hidden="true" style="--i:12;--r:-10">b</span><span class="r29l" aria-hidden="true" style="--i:13;--r:10">l</span><span class="r29l" aria-hidden="true" style="--i:14;--r:-10">i</span><span class="r29l" aria-hidden="true" style="--i:15;--r:10">s</span><span class="r29l" aria-hidden="true" style="--i:16;--r:-10">h</span><span class="r29l" aria-hidden="true" style="--i:17;--r:10">,</span></span> <span class="r29w"><span class="r29l" aria-hidden="true" style="--i:18;--r:-10">m</span><span class="r29l" aria-hidden="true" style="--i:19;--r:10">e</span><span class="r29l" aria-hidden="true" style="--i:20;--r:-10">a</span><span class="r29l" aria-hidden="true" style="--i:21;--r:10">s</span><span class="r29l" aria-hidden="true" style="--i:22;--r:-10">u</span><span class="r29l" aria-hidden="true" style="--i:23;--r:10">r</span><span class="r29l" aria-hidden="true" style="--i:24;--r:-10">e</span><span class="r29l" aria-hidden="true" style="--i:25;--r:10">.</span></span></h2>
 <p class="lede">How I would work with you: four steps, repeated each week.</p>
@@ -3361,6 +3381,7 @@ function init(root){
         next=card.querySelector('.ni-next'),rep=card.querySelector('.ni-replay'),
         nt=next.querySelector('.ni-nt'),nx=next.querySelector('.ni-nx'),ne=next.querySelector('.ni-ne'),
         intro=sayEl.textContent.trim(),n0=snEl.textContent.trim();
+    var fills=[].slice.call(card.querySelectorAll('.ni-fill'));function sdOff(){card.classList.remove('ni-sd');fills.forEach(function(f){f.style.removeProperty('--f')});}
     function setLv(lv){
       card.setAttribute('data-lv',lv);
       gated.forEach(function(e){var f=+e.getAttribute('data-from'),u=e.getAttribute('data-until'),on=f<=lv&&(u==null||lv<=+u);e.classList.toggle('on',on);});
@@ -3430,7 +3451,7 @@ function init(root){
         var h=r.height,vh=window.innerHeight,den=Math.max(1,h-vh*.55);
         p=clamp((vh*.3-r.top)/den,0,1);z=clamp(Math.floor(p*(N+1)),0,N);
       }
-      if(prog)prog.parentNode.style.setProperty('--p',p.toFixed(3));
+      if(prog)prog.parentNode.style.setProperty('--p',p.toFixed(3));if(mode==='pass'&&!calmNow()){card.classList.add('ni-sd');var q=p*(N+1);for(var fi=0;fi<fills.length;fi++){var fk=+fills[fi].getAttribute('data-from');fills[fi].style.setProperty('--f',clamp(q-(fk-1),0,1).toFixed(3));}}
       prog&&(prog.style.setProperty('--p',p.toFixed(3)));
       if(z!==lastZ){
         var first=lastZ===-1;lastZ=z;
@@ -3440,6 +3461,7 @@ function init(root){
       }
     }
     function jump(s){
+      sdOff();
       if(!card.classList.contains('live')||card.classList.contains('armed'))finish();
       s=clamp(s,0,N);show(s);
       if(mode==='pin'){
@@ -3466,6 +3488,11 @@ function init(root){
           if(vis&&!started){if(big)build();}else loopSync();
         });},{threshold:[0,.15,.3,.45,.6,.75]});
         io.observe(card);
+        /* item 1: the figure is the thing people see, so it starts the build the moment any of it enters */
+        var fgEl=card.querySelector('.ni-fig');
+        if(fgEl){var io2=new IntersectionObserver(function(es){es.forEach(function(en){
+          if(en.isIntersecting&&!started){vis=true;build();io2.disconnect();}
+        });},{threshold:0,rootMargin:'0px 0px 0px 0px'});io2.observe(fgEl);}
       }else{vis=true;build();}
     }
     var tk=0;
@@ -3878,6 +3905,49 @@ html.calm :is(.tt-frame,.rs-ground,.ni-stk,.cr-card,.cs-nudgew){transform:none!i
 @media(prefers-reduced-motion:reduce){:is(#facts,#match,#software,#p-reel,#p-cruise,#p-t1840,#p-ni)>.wrap{animation:none!important;clip-path:none!important;opacity:1!important}:is(.tt-frame,.rs-ground,.ni-stk,.cr-card,.cs-nudgew){transform:none!important}}
 
 #p-ni .ni-total .ni-two{display:grid!important;grid-template-columns:1fr!important;width:100%}#p-ni .ni-total .ni-c{width:100%;max-width:none;box-sizing:border-box}
+/* ===== motion-upgrade-1123 ===== every rule is off under html.calm, prefers-reduced-motion and print */
+#match .duty{padding-right:34px}
+#match .duty .mtk{position:absolute;right:2px;top:20px;width:22px;height:22px;pointer-events:none}
+#match .duty .mtk svg{display:block;width:22px;height:22px;fill:none;stroke:var(--tai);stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+#match .duty.gap .mtk svg{stroke:var(--flag)}
+#match .duty .mtk .pth{stroke-dasharray:1;stroke-dashoffset:0}
+#match .duty .mtk circle{stroke-opacity:.45}
+.js:not(.calm) #match .duty .mtk .pth{stroke-dashoffset:1;transition:stroke-dashoffset .5s var(--out) .45s}
+.js:not(.calm) #match .duty.in .mtk .pth{stroke-dashoffset:0}
+.js:not(.calm) #match .duty .mtk circle{transform-origin:50% 50%;transform:scale(.4);opacity:0;transition:transform .4s var(--out) .3s,opacity .3s ease .3s}
+.js:not(.calm) #match .duty.in .mtk circle{transform:none;opacity:1}
+#match .mtally{display:block;margin-top:6px;font:700 13px var(--sans);letter-spacing:.04em;color:var(--ink);font-variant-numeric:tabular-nums}
+#match .mtally b{color:var(--tai)}#match .mtally em{font-style:normal;color:var(--flag)}
+@keyframes mpulse{0%{outline-color:rgba(31,122,140,0)}25%{outline-color:rgba(31,122,140,.85)}100%{outline-color:rgba(31,122,140,0)}}
+.js:not(.calm) .mpulse{outline:4px solid transparent;outline-offset:-8px;animation:mpulse 1.4s ease-out 1}
+/* contact finale */
+#contact h2 .lt{display:inline-block;white-space:pre}
+.js:not(.calm) #contact h2 .lt{opacity:0;transform:translateY(.45em) rotate(4deg);transition:opacity .45s var(--out) calc(var(--i)*55ms),transform .6s var(--out) calc(var(--i)*55ms)}
+.js:not(.calm) #contact h2.in .lt{opacity:1;transform:none}
+#contact .lnrow .cpy{position:relative;overflow:hidden}
+.js:not(.calm) #contact .lnrow .cpy::after{content:"";position:absolute;top:0;bottom:0;left:-60%;width:40%;background:linear-gradient(100deg,transparent,rgba(255,255,255,.55),transparent);transform:skewX(-18deg) translateX(-120%);pointer-events:none}
+.js:not(.calm) #contact .lnrow.in .cpy::after{animation:msheen 1s ease-out 1.1s 1 both}
+@keyframes msheen{to{transform:skewX(-18deg) translateX(520%)}}
+/* section h2 wipe, scroll driven, only where the browser supports it */
+@supports (animation-timeline:view()){
+@media(prefers-reduced-motion:no-preference){
+@keyframes h2wipe{from{clip-path:inset(-.2em 100% -.2em -.1em)}to{clip-path:inset(-.2em -.1em -.2em -.1em)}}
+@media not print{
+.js:not(.calm) #facts h2,.js:not(.calm) #match h2,.js:not(.calm) #flow h2,.js:not(.calm) #software h2,.js:not(.calm) #p-ni h2{animation:h2wipe linear both;animation-timeline:view();animation-range:entry 5% entry 70%}
+}}}
+/* now playing */
+.dm-np{display:none}
+.js:not(.calm) .dm[data-dm]{position:relative}.js:not(.calm) .dm[data-dm] .dm-np{display:block;position:absolute;left:0;right:0;top:0;height:4px;margin:0;z-index:3;pointer-events:none}.js:not(.calm) .dm[data-dm] .dm-np .npl{position:absolute;right:12px;top:10px;font:700 10px var(--sans);letter-spacing:.1em;text-transform:uppercase;color:var(--hi)}
+.dm-np i{position:absolute;inset:0;background:rgba(143,211,222,.22);overflow:hidden}
+.dm-np i::after{content:"";position:absolute;inset:0;background:var(--hi);transform:scaleX(1);transform-origin:0 50%}
+.dm.rs .dm-np i::after{transform:scaleX(0);animation:npfill 9s linear forwards}
+@keyframes npfill{to{transform:scaleX(.92)}}
+.dm:not(.rs) .dm-np i::after{transition:transform .3s ease-out}
+.dm.rs .dm-np .npl::before{content:"Now playing"}.dm:not(.rs) .dm-np .npl::before{content:"Played"}
+@media print{.dm-np{display:none!important}}
+@media(prefers-reduced-motion:reduce){.dm-np{display:none!important}}
+/* view transition on chapter links */
+@supports (view-transition-name:a){@media(prefers-reduced-motion:no-preference){::view-transition-old(root),::view-transition-new(root){animation-duration:.32s;animation-timing-function:cubic-bezier(.22,1,.36,1)}}}
 </style><script>(function(){'use strict';var R=document.documentElement,mq=matchMedia('(prefers-reduced-motion:reduce)');
 var WR=[].slice.call(document.querySelectorAll('#facts>.wrap,#match>.wrap,#software>.wrap,#p-reel>.wrap,#p-cruise>.wrap,#p-t1840>.wrap,#p-ni>.wrap'));
 var last=scrollY,lt=performance.now(),v=0,sk=0,run=false;
@@ -3890,7 +3960,13 @@ R.style.setProperty('--sk',sk.toFixed(3)+'deg');wipes();
 if(Math.abs(sk)>.004||Math.abs(inst)>1)requestAnimationFrame(step);else{run=false;R.style.setProperty('--sk','0deg')}}
 function kick(){if(!run){run=true;lt=performance.now();last=scrollY;requestAnimationFrame(step)}}
 addEventListener('scroll',kick,{passive:true});addEventListener('resize',kick);wipes();
-})();</script><script>/* r30 strip */(function(){'use strict';var R=document.documentElement,sec=document.getElementById('strip');if(!sec)return;
+})();</script><script>/* strip phone carousel */(function(){var sec=document.getElementById('strip'),ul=sec&&sec.querySelector('.stk-static');if(!ul)return;var lis=[].slice.call(ul.children),n=lis.length;
+var pos=document.createElement('div');pos.className='stk-pos';pos.setAttribute('aria-hidden','true');var dots=lis.map(function(){var i=document.createElement('i');pos.appendChild(i);return i}),ct=document.createElement('b');pos.appendChild(ct);ul.parentNode.insertBefore(pos,ul.nextSibling);
+ul.tabIndex=0;ul.setAttribute('role','region');ul.setAttribute('aria-label','Strip of outputs, swipe sideways');
+function upd(){var c=ul.scrollLeft+ul.clientWidth/2,b=0,bd=1e9;lis.forEach(function(l,k){var d=Math.abs(l.offsetLeft+l.offsetWidth/2-c);if(d<bd){bd=d;b=k}});dots.forEach(function(d,k){d.classList.toggle('on',k===b)});ct.textContent=(b+1)+' / '+n}
+var t=0;ul.addEventListener('scroll',function(){if(!t)t=requestAnimationFrame(function(){t=0;upd()})},{passive:true});addEventListener('resize',upd);upd();
+ul.addEventListener('keydown',function(e){if(e.key==='ArrowRight'||e.key==='ArrowLeft'){e.preventDefault();ul.scrollBy({left:(e.key==='ArrowRight'?1:-1)*lis[0].offsetWidth,behavior:'auto'})}});})();</script>
+<script>/* r30 strip */(function(){'use strict';var R=document.documentElement,sec=document.getElementById('strip');if(!sec)return;
 var fine=matchMedia('(pointer:fine)').matches&&innerWidth>=768,rm=matchMedia('(prefers-reduced-motion:reduce)').matches;if(!fine||rm)return;
 var cv=document.getElementById('stkgl'),gl=cv.getContext('webgl',{antialias:true,alpha:false});if(!gl)return;
 var imgs=[].slice.call(sec.querySelectorAll('.stk-static img')),caps=imgs.map(function(i){return i.nextElementSibling.textContent});
@@ -3918,4 +3994,45 @@ function step(n){var dt=Math.min(50,n-lt);lt=n;tgt=prog()*(N-1)*PITCH;var d=tgt-
  if(Math.abs(tgt-cur)>.0005||Math.abs(vel)>.002)requestAnimationFrame(step);else{run=false;vel=0;draw()}}
 function kick(){if(!run){run=true;lt=performance.now();requestAnimationFrame(step)}}
 addEventListener('scroll',kick,{passive:true});addEventListener('resize',kick);kick();
-})();</script></body></html>
+})();</script><script>/* motion-upgrade-1123 */
+(function(){'use strict';
+var de=document.documentElement,mq=window.matchMedia?matchMedia('(prefers-reduced-motion: reduce)'):{matches:false};
+function calm(){return mq.matches||de.classList.contains('calm');}
+function $$(s,c){return[].slice.call((c||document).querySelectorAll(s));}
+/* 2 proof ledger */
+var duties=$$('#match .duty');
+if(duties.length){
+ duties.forEach(function(d){var g=d.classList.contains('gap');var s=document.createElement('span');s.className='mtk';s.setAttribute('aria-hidden','true');
+  s.innerHTML=g?'<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path class="pth" pathLength="1" d="M8 12h8"/></svg>':'<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path class="pth" pathLength="1" d="M7.5 12.5l3 3 6-6.5"/></svg>';d.appendChild(s);});
+ var key=document.querySelector('#match .mkey'),tl=document.createElement('span');tl.className='mtally';tl.setAttribute('aria-hidden','true');
+ var tot=duties.length,shown=duties.filter(function(d){return !d.classList.contains('gap');}).length;
+ var paint=function(){var sh=duties.filter(function(d){return d.classList.contains('in')&&!d.classList.contains('gap');}).length;
+  var n=duties.filter(function(d){return d.classList.contains('in');}).length,ns=n-sh;if(calm()){sh=shown;ns=tot-shown;}
+  var h='Checked so far: <b>'+sh+' shown</b>, <em>'+ns+' not yet</em>';if(tl.innerHTML!==h)tl.innerHTML=h;};
+ if(key)key.parentNode.insertBefore(tl,key.nextSibling);
+ paint();
+ new MutationObserver(paint).observe(document.getElementById('match'),{subtree:true,attributes:true,attributeFilter:['class']});
+ $$('#match a.prf[data-go]').forEach(function(a){a.addEventListener('click',function(){
+  var t=document.querySelector(a.getAttribute('href'));if(!t||calm())return;
+  setTimeout(function(){t.classList.remove('mpulse');void t.offsetWidth;t.classList.add('mpulse');setTimeout(function(){t.classList.remove('mpulse');},1500);},500);});});
+}
+/* 5 contact letters */
+var h=document.querySelector('#contact h2');
+if(h&&!h.querySelector('.lt')){var txt=h.textContent;h.setAttribute('aria-label',txt);h.textContent='';
+ txt.split('').forEach(function(ch,i){var s=document.createElement('span');s.className='lt';s.setAttribute('aria-hidden','true');s.style.setProperty('--i',i);s.textContent=ch;h.appendChild(s);});}
+/* 8 now playing bars */
+$$('.dm[data-dm]').forEach(function(a){var sc=a.querySelector('.dm-scene');if(!sc||a.querySelector('.dm-np'))return;
+ var n=document.createElement('div');n.className='dm-np';n.setAttribute('aria-hidden','true');n.innerHTML='<span class="npl"></span><i></i>';sc.parentNode.insertBefore(n,sc);});
+/* 7 view transitions on chapter links */
+if(document.startViewTransition){
+ document.addEventListener('click',function(e){
+  var a=e.target.closest&&e.target.closest('.chap a,header.bar nav a[href^="#"],#jump a[href^="#"]');
+  if(!a||calm()||e.defaultPrevented||e.metaKey||e.ctrlKey||e.shiftKey)return;
+  var id=a.getAttribute('href');if(!id||id.charAt(0)!=='#')return;
+  var t=id==='#top'?document.body:document.querySelector(id);if(!t)return;
+  e.preventDefault();
+  var go=function(){var y=id==='#top'?0:t.getBoundingClientRect().top+scrollY-(parseInt(getComputedStyle(de).scrollPaddingTop)||0);window.scrollTo({top:y,behavior:'instant'});if(history.replaceState)history.replaceState(null,'',id==='#top'?location.pathname+location.search:id);};
+  try{document.startViewTransition(go);}catch(x){go();}
+ });}
+})();</script>
+</body></html>
