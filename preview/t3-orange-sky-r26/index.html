@@ -4596,6 +4596,20 @@ html body main #contact{padding-top:clamp(64px,calc(43.2px + 5.333vw),120px)!imp
 html body main section>:last-child{margin-bottom:0}
 /* r26 dots: earlier rule set content:none on the ::before hit box; restore it so every dot has a 44px hit area (8px dot plus 18px inset each side) */
 html body main #p-carousel .dots button::before,html body main .dots button::before{content:""!important;position:absolute!important;inset:-18px!important}
+/* r27: dot hit boxes tile (no neighbour overlap) so sampling reads 44 tall on every dot */
+html body main #p-carousel .dots button::before,html body main .dots button::before{inset:-18px -7px!important}
+/* r27b: chapter rail pitch 44 so each dot's 44px hit box tiles; map pin hit box 44 */
+html body .chap a{margin:16px 14px 16px 0}
+html body .pinb::before{inset:-18px}
+/* r27c: active rail dot scales 1.3, its hit box is counter-scaled so it stays 44 and never covers neighbours */
+html body .chap a.on:not(.btn):not(.cardlink)::before{transform:scale(.7692)}
+/* r27d: ghost inbox rows read at full strength; Mon on the orange chip is near-black (4.0 to 6+) */
+html body #p-edm .ib-r.ph{opacity:1}
+html body #p-edm .ib-r.ph b::before,html body #p-edm .ib-r.ph span::before{color:#4A4953!important}
+html body #p-edm .ib-r.ph em::before{color:#1A0A00!important}
+/* r27e: same fix at the specificity that wins (main #p-edm): ghost rows full opacity, text near-black */
+html body main #p-edm .ib-r.ph{opacity:1!important}
+html body main #p-edm .ib-r.ph b::before,html body main #p-edm .ib-r.ph span::before,html body main #p-edm .ib-r.ph em::before{color:#1A0A00!important}
 </style><script>(function(){'use strict';var R=document.documentElement,mq=matchMedia('(prefers-reduced-motion:reduce)');
 var WR=[].slice.call(document.querySelectorAll('#facts>.wrap,#match>.wrap,#software>.wrap,#p-reel>.wrap,#p-cruise>.wrap,#p-t1840>.wrap,#p-ni>.wrap'));
 var last=scrollY,lt=performance.now(),v=0,sk=0,run=false;
