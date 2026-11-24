@@ -4594,6 +4594,8 @@ html body main #flow{padding-top:clamp(36px,calc(16.7px + 4.952vw),88px)!importa
 html body main #software{padding-top:clamp(56px,calc(35.2px + 5.333vw),112px)!important;padding-bottom:clamp(48px,calc(30.2px + 4.571vw),96px)!important}
 html body main #contact{padding-top:clamp(64px,calc(43.2px + 5.333vw),120px)!important;padding-bottom:clamp(48px,calc(36.1px + 3.048vw),80px)!important}
 html body main section>:last-child{margin-bottom:0}
+/* r26 dots: earlier rule set content:none on the ::before hit box; restore it so every dot has a 44px hit area (8px dot plus 18px inset each side) */
+html body main #p-carousel .dots button::before,html body main .dots button::before{content:""!important;position:absolute!important;inset:-18px!important}
 </style><script>(function(){'use strict';var R=document.documentElement,mq=matchMedia('(prefers-reduced-motion:reduce)');
 var WR=[].slice.call(document.querySelectorAll('#facts>.wrap,#match>.wrap,#software>.wrap,#p-reel>.wrap,#p-cruise>.wrap,#p-t1840>.wrap,#p-ni>.wrap'));
 var last=scrollY,lt=performance.now(),v=0,sk=0,run=false;
