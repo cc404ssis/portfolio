@@ -60,12 +60,12 @@ button{background:none;border:0;cursor:pointer}
 .sw[aria-pressed=true]{box-shadow:0 0 0 2px var(--bg),0 0 0 3.5px var(--ink)}
 #hint{color:var(--ink2);background:rgba(10,12,16,.78);padding:3px 10px;border-radius:999px;position:fixed;left:50%;top:112px;transform:translateX(-50%);font-size:12px;color:var(--ink3);pointer-events:none;z-index:2;text-align:center;transition:opacity .3s;white-space:nowrap}
 #hint.off{opacity:0}
-#note{color:var(--ink2);background:rgba(10,12,16,.82);padding:4px 8px;border-radius:8px;position:fixed;left:12px;bottom:calc(96px + env(safe-area-inset-bottom));font:12px/1.4 var(--mono);color:var(--ink3);max-width:360px;z-index:4;pointer-events:none;transition:bottom .24s ease}
+#note{color:var(--ink2);background:rgba(10,12,16,.82);padding:4px 8px;border-radius:8px;position:fixed;left:12px;bottom:calc(96px + env(safe-area-inset-bottom));font:12px/22px var(--mono);color:var(--ink3);max-width:360px;z-index:4;pointer-events:none;transition:bottom .24s ease}
 #note.ph{color:var(--sig)}
 #note a{text-underline-offset:3px}
 #note span{display:block;white-space:normal}
 #note a{color:inherit;pointer-events:auto;position:relative}
-#note a::before{content:"";position:absolute;left:-2px;right:-2px;top:-15px;bottom:-15px}
+#note a::before{content:"";position:absolute;left:-2px;right:-2px;top:-11px;bottom:-11px}
 #note .r1 a::before{top:-32px;bottom:-3px}
 #note .r2 a::before{top:-3px;bottom:-32px}
 #load{position:fixed;left:0;top:0;height:2px;background:var(--sig);width:0;z-index:9;transition:width .2s,opacity .3s}
