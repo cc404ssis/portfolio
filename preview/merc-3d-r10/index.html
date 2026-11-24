@@ -524,9 +524,9 @@ function flyToBox(box,pad=1){
  const c=box.getCenter(new THREE.Vector3()),sz=box.getSize(new THREE.Vector3());const r=Math.max(sz.x,sz.y,sz.z,.12)*pad;
  const sx=Math.abs(c.x)>.3?Math.sign(c.x):.5,sz2=c.z>=0?1:-1;
  const dir=new THREE.Vector3(sx*.7,CY,sz2*.78).normalize();
- const F=S.free||{fw:1,fh:1},vh=2*Math.tan(THREE.MathUtils.degToRad(camera.fov)/2),vw=vh*camera.aspect,want=.4;
+ const F=S.free||{fw:1,fh:1},vh=2*Math.tan(THREE.MathUtils.degToRad(camera.fov)/2),vw=vh*camera.aspect,want=.36;
  /* distance at which the part box covers about 40% of the free area, never closer than 2.6 m (closer = grey murk) */
- const dist=THREE.MathUtils.clamp(Math.max(r/(want*vh*F.fh),r/(want*vw*F.fw)),2.6,7.5);
+ const dist=THREE.MathUtils.clamp(Math.max(r/(want*vh*F.fh),r/(want*vw*F.fw)),3.6,7.5);
  flyCam(c.clone().addScaledVector(dir,dist),c,dist);
 }
 function nearestParts(id,n=4){const c=CEN[id];return Object.keys(PARTS).filter(k=>k!==id).sort((a,b)=>CEN[a].distanceTo(c)-CEN[b].distanceTo(c)).slice(0,n)}
@@ -620,6 +620,9 @@ function declutter(force){
  pts.forEach(a=>{if(used.has(a))return;used.add(a);const m=[a];
   if(S.sel!==a.id)pts.forEach(b=>{if(used.has(b)||S.sel===b.id)return;if(Math.hypot(a.q.x-b.q.x,a.q.y-b.q.y)<CLR){used.add(b);m.push(b)}});
   cls.push(m)});
+ for(let g=0;g<8;g++){let mg=false;const cen=m=>({x:m.reduce((a,p)=>a+p.q.x,0)/m.length,y:m.reduce((a,p)=>a+p.q.y,0)/m.length});
+  outer:for(let i=0;i<cls.length;i++)for(let j=i+1;j<cls.length;j++){if(S.sel&&(cls[i][0].id===S.sel||cls[j][0].id===S.sel))continue;const a=cen(cls[i]),b=cen(cls[j]);if(Math.hypot(a.x-b.x,a.y-b.y)<CLR+8){cls[i]=cls[i].concat(cls[j]);cls.splice(j,1);mg=true;break outer}}
+  if(!mg)break}
  const sig=cls.map(m=>m.length+(m[0].edge?'e':'')+':'+Math.round(m[0].q.x)+','+Math.round(m[0].q.y)).join('|')+S.sys+S.sel;
  if(sig===clSig&&!force)return;clSig=sig;
  const host=$('#cl');let k=0;
