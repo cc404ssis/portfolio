@@ -1,0 +1,705 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="color-scheme" content="dark">
+<title>S320 L (W220) 3D fix map</title>
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.187.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.187.0/examples/jsm/"}}</script>
+<style>
+:root{--bg:#0a0c10;--s1:#10141a;--s2:#161b23;--s3:#1d242e;--line:#252d38;--ink:#e9edf2;--ink2:#b3bcc8;--ink3:#8a95a3;--sig:#ffb547;
+--fix:#ffb547;--stereo:#3fd0ff;--air:#ff6fae;--scan:#c39bff;--ui:ui-sans-serif,-apple-system,"SF Pro Text","Segoe UI",system-ui,Roboto,sans-serif;--mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;--sheet:0px}
+*{box-sizing:border-box;margin:0}
+html,body{height:100%;background:var(--bg);color:var(--ink);font:14px/1.4 var(--ui);overflow:hidden;-webkit-text-size-adjust:100%;touch-action:manipulation}
+button,input{font:inherit;color:inherit}
+button{background:none;border:0;cursor:pointer}
+:focus-visible{outline:2px solid var(--sig);outline-offset:2px}
+#stage{position:fixed;inset:0;touch-action:none}
+#stage canvas{display:block;width:100%;height:100%;outline:0}
+.num{font-family:var(--mono);font-variant-numeric:tabular-nums;font-feature-settings:"tnum" 1,"liga" 0}
+#top{position:fixed;left:0;right:0;top:0;padding:calc(12px + env(safe-area-inset-top)) 12px 0;display:flex;flex-direction:column;gap:8px;pointer-events:none;z-index:5}
+#top>*{pointer-events:auto}
+#top::before{content:"";position:absolute;left:0;right:0;top:0;bottom:-28px;background:linear-gradient(rgba(10,12,16,.92) 0,rgba(10,12,16,.78) 60%,rgba(10,12,16,0));z-index:-1;pointer-events:none}
+.row1{display:flex;align-items:center;gap:12px}
+.brand{font-weight:650;letter-spacing:.01em;white-space:nowrap}
+.brand small{display:block;font:500 11px var(--mono);color:var(--ink3);letter-spacing:.04em}
+.sbox{position:relative;flex:1;max-width:400px}
+.sbox::before,.sbox::after{content:"";position:absolute;left:0;right:0;height:2px}
+.sbox::before{top:-2px}.sbox::after{bottom:-2px}
+#q{width:100%;height:40px;border-radius:10px;border:1px solid var(--line);background:rgba(16,20,26,.86);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);padding:0 12px 0 36px;font-size:16px;color:var(--ink)}
+#q::placeholder{color:var(--ink3)}
+.sbox svg{position:absolute;left:11px;top:12px;width:16px;height:16px;stroke:var(--ink3);fill:none;stroke-width:2;pointer-events:none;z-index:2}
+#res{position:absolute;top:46px;left:0;right:0;background:#161b23;border:1px solid var(--line);border-radius:10px;overflow:hidden;display:none;box-shadow:0 14px 40px rgba(0,0,0,.55)}
+#res.on{display:block}
+#res button{display:flex;width:100%;align-items:center;gap:10px;text-align:left;padding:9px 12px;min-height:44px;border-top:1px solid var(--line)}
+#res button:first-child{border-top:0}
+#res button:hover,#res button[aria-selected=true]{background:var(--s3)}
+#res b{font-weight:600;flex:1}
+#res i{font:normal 11px var(--mono);color:var(--ink3);white-space:nowrap}
+#res .none{padding:12px;color:var(--ink2)}
+.dot{width:8px;height:8px;border-radius:50%;flex:none;background:var(--ink3)}
+.g-fix{--c:var(--fix)}.g-stereo{--c:var(--stereo)}.g-air{--c:var(--air)}.g-scan{--c:var(--scan)}
+.dot[class*=g-]{background:var(--c)}
+#chips{display:flex;gap:6px;padding:8px 0;margin-top:-6px;overflow-x:auto;scrollbar-width:none;touch-action:pan-x;overscroll-behavior:contain}
+#chips::-webkit-scrollbar{display:none}
+.chip{position:relative;flex:none;height:30px;padding:0 11px;border-radius:15px;border:1px solid var(--line);background:rgba(16,20,26,.86);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);font-size:13px;color:var(--ink2);display:inline-flex;align-items:center;gap:7px;white-space:nowrap}
+.chip::before,.seg button::before,.ib::before,.sw::before{content:"";position:absolute;inset:-8px -3px}
+.chip::before{inset:-8px -3px}
+.sw::before{inset:-13px -4px}
+.chip[aria-pressed=true]{color:var(--ink);border-color:var(--c,var(--ink2));box-shadow:inset 0 0 0 1px var(--c,var(--ink2))}
+#bar{position:fixed;left:12px;bottom:calc(14px + env(safe-area-inset-bottom));display:flex;align-items:center;gap:10px;z-index:5;transition:bottom .24s ease}
+.seg{display:flex;padding:3px;gap:2px;border-radius:10px;border:1px solid var(--line);background:rgba(16,20,26,.86);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}
+.seg button{position:relative;height:30px;padding:0 13px;border-radius:7px;font-size:13px;color:var(--ink2)}
+.seg button[aria-pressed=true]{color:var(--ink);background:var(--s3);box-shadow:inset 0 0 0 1px #3a4554}
+.ib{position:relative;width:32px;height:32px;border-radius:9px;border:1px solid var(--line);background:rgba(16,20,26,.86);display:grid;place-items:center;color:var(--ink2)}
+.ib svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2}
+#paint{display:flex;gap:8px;align-items:center;margin-left:4px}
+.sw{position:relative;width:20px;height:20px;border-radius:50%;border:1px solid #fff3}
+.sw[aria-pressed=true]{box-shadow:0 0 0 2px var(--bg),0 0 0 3.5px var(--ink)}
+#hint{position:fixed;left:50%;top:112px;transform:translateX(-50%);font-size:12px;color:var(--ink3);pointer-events:none;z-index:2;text-align:center;transition:opacity .3s;white-space:nowrap}
+#hint.off{opacity:0}
+#note{position:fixed;left:12px;bottom:calc(96px + env(safe-area-inset-bottom));font:12px/1.4 var(--mono);color:var(--ink3);max-width:360px;z-index:4;pointer-events:none;transition:bottom .24s ease}
+#note.ph{color:var(--sig)}
+#note a{text-underline-offset:3px}
+#note span{display:block;white-space:nowrap}
+#note a{color:inherit;pointer-events:auto;position:relative}
+#note a::before{content:"";position:absolute;left:-2px;right:-2px}
+#note .r1 a::before{top:-32px;bottom:-3px}
+#note .r2 a::before{top:-3px;bottom:-32px}
+#load{position:fixed;left:0;top:0;height:2px;background:var(--sig);width:0;z-index:9;transition:width .2s,opacity .3s}
+#panel{position:fixed;right:16px;top:12px;bottom:16px;width:392px;z-index:6;border-radius:14px;border:1px solid var(--line);background:rgba(16,20,26,.92);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);display:flex;flex-direction:column;transform:translateX(calc(100% + 24px));transition:transform .24s cubic-bezier(.2,.8,.2,1);overflow:hidden}
+#panel.open{transform:none}
+#ph{display:flex;gap:12px;align-items:flex-start;padding:16px 16px 12px;border-bottom:1px solid var(--line);flex:none}
+#ph h2{font-size:17px;line-height:1.25;font-weight:650}
+#ph .sys{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:6px}
+.tag{font:600 10.5px var(--mono);letter-spacing:.05em;text-transform:uppercase;color:var(--c,var(--ink3));display:inline-flex;gap:6px;align-items:center}
+#pgrow{flex:1;text-align:left;min-width:0}
+#pbody{overflow-y:auto;overscroll-behavior:contain;touch-action:pan-y;padding:16px 16px 24px;flex:1;min-height:0}
+#pfoot{flex:none;border-top:1px solid var(--line);padding:12px 16px 16px;background:rgba(10,12,16,.5)}
+#pfoot h3{font:600 11px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--ink3);margin:0 0 12px}
+#pfoot:empty{display:none}
+#pbody p{color:var(--ink2);margin-bottom:10px}
+.flag{display:inline-block;font:11px var(--mono);color:var(--sig);border:1px solid #ffb54755;background:#ffb5471a;border-radius:5px;padding:2px 7px;margin-bottom:10px}
+#pbody h3{font:600 11px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--ink3);margin:14px 0 6px}
+details{border:1px solid var(--line);border-left:3px solid var(--c,var(--ink3));border-radius:8px;background:var(--s1);margin-bottom:8px}
+summary{list-style:none;cursor:pointer;padding:10px 12px;min-height:44px;font-weight:600;display:flex;align-items:center;gap:8px}
+summary::-webkit-details-marker{display:none}
+summary::after{content:"";margin-left:auto;width:7px;height:7px;border-right:2px solid var(--ink3);border-bottom:2px solid var(--ink3);transform:rotate(45deg);transition:transform .15s;flex:none}
+details[open] summary::after{transform:rotate(-135deg)}
+.cb{padding:0 12px 12px;color:var(--ink2)}
+.cb h4{font:600 11px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--ink3);margin:12px 0 4px}
+.cb ul,.cb ol{padding-left:18px}.cb li{margin:3px 0}
+.cb .q{border-left:2px solid var(--line);padding-left:10px;color:var(--ink3);font-style:italic}
+.cb .v{color:var(--ink)}
+.cb .meta{font:12px var(--mono);color:var(--ink3);margin-top:10px}
+.safe{display:inline-block;font:600 11px var(--mono);color:#ff8a8a;border:1px solid #ff8a8a55;border-radius:5px;padding:2px 7px;margin:8px 0 0}
+.fxs small{color:var(--ink3);display:block}
+.nb{display:flex;flex-wrap:wrap;gap:16px 8px;padding:4px 0}
+.nb button{position:relative;height:30px;padding:0 10px;border-radius:15px;border:1px solid var(--line);color:var(--ink2);font-size:13px}
+.nb button::before{content:"";position:absolute;inset:-8px -3px}
+#pclose{position:relative;flex:none;width:32px;height:32px;border-radius:9px;color:var(--ink2);border:1px solid var(--line)}
+#pclose::before{content:"";position:absolute;inset:-7px}
+#pclose svg{width:14px;height:14px;stroke:currentColor;stroke-width:2;fill:none;vertical-align:middle}
+#grab{display:none}
+#cl{position:fixed;inset:0;pointer-events:none;z-index:3}
+.clb{position:absolute;left:0;top:0;width:44px;height:44px;margin:-22px 0 0 -22px;scale:var(--k,1);border-radius:50%;pointer-events:auto;display:grid;place-items:center;font:700 14px var(--mono);color:#0a0c10;background:var(--c,#ffb547);border:3px solid rgba(10,12,16,.9);box-shadow:0 0 0 2px var(--c,#ffb547),0 6px 16px rgba(0,0,0,.5);touch-action:manipulation}
+.clb:active{transform:scale(.94)}
+#clist{position:fixed;z-index:7;width:260px;max-width:calc(100vw - 20px);display:none;background:#161b23;border:1px solid var(--line);border-radius:12px;overflow:hidden;box-shadow:0 14px 40px rgba(0,0,0,.6)}
+#clist.on{display:block}
+#clist button{display:flex;width:100%;align-items:center;gap:10px;text-align:left;padding:8px 12px;min-height:44px;border-top:1px solid var(--line);font-size:13px}
+#clist button:first-child{border-top:0}
+#clist button:hover{background:var(--s3)}
+@media (min-width:701px){#panel{top:120px}}
+@media (min-width:701px) and (max-width:900px){body.pOpen #paint{display:none}}
+@media (min-width:701px){#top{padding:calc(16px + env(safe-area-inset-top)) 16px 0;gap:12px}#bar{left:16px;bottom:calc(16px + env(safe-area-inset-bottom))}#note{left:16px}.row1{gap:16px}}
+@media (max-width:700px){
+ #top{padding:calc(8px + env(safe-area-inset-top)) 10px 0}
+ .row1{flex-wrap:wrap;gap:4px 12px}
+ .brand{flex:1 0 100%;display:flex;align-items:baseline;gap:8px;font-size:16px;padding-left:2px}
+ .brand small{display:inline;font-size:10.5px}
+ #hint{top:156px}
+ .sbox{max-width:none}
+ #paint{display:none}
+ #bar{left:10px;bottom:calc(12px + env(safe-area-inset-bottom) + var(--sheet))}
+ #note{left:10px;bottom:calc(88px + env(safe-area-inset-bottom) + var(--sheet));max-width:360px;font-size:11px}
+ #panel{left:0;right:0;top:auto;bottom:0;width:auto;height:56dvh;border-radius:16px 16px 0 0;border-bottom:0;transform:translateY(105%)}
+ #panel.open{transform:none}
+ #grab{display:block;position:absolute;left:50%;top:6px;width:36px;height:4px;margin-left:-18px;border-radius:2px;background:#3a4554}
+ #ph{padding-top:20px}
+  body.pOpen #note{display:none}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+#nogl{position:fixed;inset:0;display:none;place-items:center;text-align:center;color:var(--ink2);padding:24px;z-index:1}
+</style>
+</head>
+<body>
+<div id="load"></div>
+<div id="stage" aria-hidden="true"></div>
+<div id="nogl">3D view unavailable on this device. Search still opens each part's fault notes.</div>
+
+<header id="top">
+ <div class="row1">
+  <div class="brand">S320 L fix map<small>W220 / M112 3.2 V6</small></div>
+  <div class="sbox">
+   <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>
+   <input id="q" type="search" autocomplete="off" spellcheck="false" placeholder="Find a part: rear strut, fuse box, stereo" role="combobox" aria-expanded="false" aria-controls="res" aria-label="Find a part or fault">
+   <div id="res" role="listbox" aria-label="Matching parts"></div>
+  </div>
+ </div>
+ <div id="chips" role="group" aria-label="Show one system"></div>
+</header>
+
+<div id="bar">
+ <div class="seg" role="group" aria-label="View">
+  <button id="vSolid" aria-pressed="true">Solid</button>
+  <button id="vPeel" aria-pressed="false">Peel</button>
+  <button id="vExp" aria-pressed="false">Take off</button>
+ </div>
+ <button class="ib" id="bReset" aria-label="Reset camera"><svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 3-6.7M3 4v5h5"/></svg></button>
+ <div id="paint" role="group" aria-label="Paint"></div>
+</div>
+<div id="cl"></div><div id="clist" role="listbox" aria-label="Parts in this group"></div>
+<div id="hint">Drag to orbit. Tap the car or search a part.</div>
+<div id="note"></div>
+
+<aside id="panel" aria-label="Part notes" aria-live="polite">
+ <div id="grab"></div>
+ <div id="ph"><div id="pgrow"></div><button id="pclose" aria-label="Close part notes"><svg viewBox="0 0 24 24"><path d="M5 5l14 14M19 5L5 19"/></svg></button></div>
+ <div id="pbody"></div>
+ <div id="pfoot"></div>
+</aside>
+
+<script id="data" type="application/json">{"parts":{"engine":{"name":"Engine block and heads (M112 3.2 V6)","d":"The 90 degree V6. The cam magnets sit on the front of each head. The 3D model shows a V8 as a stand-in, so the cylinder count here is not to scale.","s":[{"b":[0.5,0.3,0.44],"at":[1.55,0.47,0]},{"b":[0.5,0.11,0.19],"at":[1.55,0.68,-0.2],"r":[-0.5,0,0]},{"b":[0.5,0.11,0.19],"at":[1.55,0.68,0.2],"r":[0.5,0,0]},{"b":[0.04,0.4,0.46],"at":[1.82,0.52,0]}]},"intake":{"name":"Intake manifold","d":"Sits in the V of the engine. The throttle body bolts to its front.","s":[{"b":[0.46,0.08,0.3],"at":[1.5,0.8,0]}]},"airbox":{"name":"Air filter housing and duct","d":"Feeds air to the throttle body. Position and number of filter boxes on your engine are approximate.","s":[{"b":[0.24,0.13,0.22],"at":[2.1,0.7,-0.42]},{"tube":[[1.99,0.74,-0.33],[1.86,0.8,-0.02],0.04]}]},"throttle":{"name":"Throttle body (electronic)","d":"Drive by wire, no separate idle valve.","s":[{"c":[0.055,0.08,"x"],"at":[1.8,0.8,0]}]},"camL":{"name":"Camshaft adjuster magnet, left head","d":"Front face of the left cylinder head.","s":[{"c":[0.035,0.05,"x"],"at":[1.865,0.7,-0.22]}]},"camR":{"name":"Camshaft adjuster magnet, right head","d":"Front face of the right cylinder head.","s":[{"c":[0.035,0.05,"x"],"at":[1.865,0.7,0.22]}]},"radiator":{"name":"Radiator","d":"Engine coolant radiator, right behind the A/C condenser.","s":[{"b":[0.045,0.48,0.76],"at":[2.24,0.52,0]}]},"fan":{"name":"Electric cooling fan","d":"Behind the radiator. It should run when the A/C is on.","s":[{"c":[0.2,0.07,"x"],"at":[2.16,0.5,0]}]},"condenser":{"name":"A/C condenser","d":"Front of the car, behind the grille, in front of the radiator. Stone damage makes it leak.","s":[{"b":[0.025,0.44,0.74],"at":[2.31,0.51,0]}]},"acComp":{"name":"A/C compressor","d":"Low on the front of the engine, belt driven. Which side on the M112 is UNVERIFIED.","s":[{"c":[0.065,0.19,"x"],"at":[1.86,0.36,-0.27]}]},"fanCtl":{"name":"Suction fan motor and control module (M4/7)","d":"Behind the radiator, in the fan shroud. 4-wire plug: ground, 12 V constant, 12 V ignition, and the ME2 speed signal. Position approximate.","s":[{"b":[0.06,0.1,0.14],"at":[2.16,0.62,0.18]}]},"acPress":{"name":"A/C refrigerant pressure sensor (B12)","d":"On the high pressure side of the A/C. The exact spot on a W220 is UNVERIFIED. The temperature sensor B12/1 sits on top of the receiver drier at the front left of the engine bay (w220.wiki); B12 is believed to be close by.","s":[{"c":[0.022,0.06,"y"],"at":[2.12,0.6,-0.5]}]},"thermo":{"name":"Coolant thermostat (M112)","d":"In the thermostat housing at the front of the engine on the coolant pipes. Exact spot UNVERIFIED.","s":[{"c":[0.04,0.06,"x"],"at":[1.9,0.46,0.1]}]},"alternator":{"name":"Alternator","d":"Charges the battery. Upper front of the engine, belt driven. Position approximate.","s":[{"c":[0.065,0.13,"x"],"at":[1.88,0.62,0.27]}]},"ambsens":{"name":"Outside temperature sensor","d":"Behind the lower front bumper. Exact W220 spot not confirmed.","s":[{"b":[0.04,0.03,0.05],"at":[2.5,0.29,-0.5]}]},"booster":{"name":"Brake booster","d":"Big round drum on the bulkhead, driver side (right on a right-hand drive car).","s":[{"c":[0.15,0.16,"x"],"at":[0.98,0.76,0.42]}]},"masterCyl":{"name":"Brake master cylinder","d":"Bolted to the front of the booster.","s":[{"c":[0.035,0.2,"x"],"at":[1.16,0.76,0.42]}]},"brakeRes":{"name":"Brake fluid reservoir","d":"On top of the master cylinder.","s":[{"b":[0.1,0.06,0.12],"at":[1.16,0.83,0.42]}]},"checkValve":{"name":"Booster vacuum check valve","d":"The small part from the TikTok tip. Push-fit into the booster.","s":[{"c":[0.02,0.05,"x"],"at":[1.085,0.82,0.31]}]},"o2a":{"name":"Oxygen sensor, left, before the cat","d":"Screwed into the left front exhaust pipe.","s":[{"c":[0.02,0.08,"y"],"at":[1.05,0.27,-0.27]}]},"o2b":{"name":"Oxygen sensor, right, before the cat","d":"Screwed into the right front exhaust pipe.","s":[{"c":[0.02,0.08,"y"],"at":[1.05,0.27,0.27]}]},"o2c":{"name":"Oxygen sensor, left, after the cat","d":"Behind the left catalytic converter.","s":[{"c":[0.02,0.08,"y"],"at":[0.15,0.23,-0.27]}]},"o2d":{"name":"Oxygen sensor, right, after the cat","d":"Behind the right catalytic converter.","s":[{"c":[0.02,0.08,"y"],"at":[0.15,0.23,0.27]}]},"plate":{"name":"Data plate (your photo)","d":"Door pillar area. Which side and exact spot is UNVERIFIED from the photo.","s":[{"b":[0.08,0.05,0.006],"at":[-0.47,0.72,-0.915]}]},"fuseL":{"name":"Fuse box, engine bay left","d":"Back of the engine bay, left side, under a cover (w220.wiki). Audio fuses live here.","s":[{"b":[0.22,0.07,0.18],"at":[0.98,0.85,-0.64]}]},"fuseR":{"name":"Fuse box, engine bay right","d":"Back of the engine bay, right side (w220.wiki). Fuse F32 and relay O for the air suspension.","s":[{"b":[0.22,0.07,0.18],"at":[0.98,0.85,0.64]}]},"amComp":{"name":"Airmatic compressor","d":"Front right, behind the bumper, reached through the wheel arch liner.","s":[{"c":[0.065,0.2,"x"],"at":[2.24,0.34,0.62]}]},"valveBlk":{"name":"Airmatic valve block","d":"Next to the compressor, front right (position from v1 sources, exact mounting UNVERIFIED).","s":[{"b":[0.1,0.06,0.1],"at":[2.24,0.44,0.62]}]},"reservoir":{"name":"Air pressure reservoir (tank)","d":"Front left, behind the bumper.","s":[{"c":[0.06,0.3,"x"],"at":[2.22,0.32,-0.6]}]},"strutFL":{"name":"Front left air strut","d":"Inside the front left wheel arch; the top is on the strut tower under the bonnet.","s":[{"c":[0.045,0.4,"y"],"at":[1.64,0.52,-0.56]},{"c":[0.085,0.18,"y"],"at":[1.64,0.76,-0.56]}]},"strutFR":{"name":"Front right air strut","d":"Inside the front right wheel arch.","s":[{"c":[0.045,0.4,"y"],"at":[1.64,0.52,0.56]},{"c":[0.085,0.18,"y"],"at":[1.64,0.76,0.56]}]},"strutRL":{"name":"Rear left air strut","d":"Inside the rear left wheel arch.","s":[{"c":[0.045,0.36,"y"],"at":[-1.445,0.52,-0.56]},{"c":[0.08,0.16,"y"],"at":[-1.445,0.77,-0.56]}]},"strutRR":{"name":"Rear right air strut","d":"Inside the rear right wheel arch.","s":[{"c":[0.045,0.36,"y"],"at":[-1.445,0.52,0.56]},{"c":[0.08,0.16,"y"],"at":[-1.445,0.77,0.56]}]},"lvlFL":{"name":"Level sensor, front left","d":"On the front left lower arm, with a short link rod.","s":[{"b":[0.05,0.04,0.05],"at":[1.52,0.25,-0.46]},{"tube":[[1.52,0.24,-0.46],[1.52,0.18,-0.58],0.008]}]},"lvlFR":{"name":"Level sensor, front right","d":"On the front right lower arm.","s":[{"b":[0.05,0.04,0.05],"at":[1.52,0.25,0.46]},{"tube":[[1.52,0.24,0.46],[1.52,0.18,0.58],0.008]}]},"lvlR":{"name":"Level sensor, rear axle","d":"One sensor for the rear axle.","s":[{"b":[0.05,0.04,0.05],"at":[-1.345,0.31,0.18]},{"tube":[[-1.345,0.3,0.18],[-1.345,0.22,0.3],0.008]}]},"lvlBtn":{"name":"Ride height (level) button","d":"Centre console. Exact spot UNVERIFIED.","s":[{"b":[0.05,0.025,0.07],"at":[0.3,0.68,0]}]},"comand":{"name":"COMAND head unit","d":"Centre of the dashboard. Master of the fibre optic audio loop.","s":[{"b":[0.1,0.13,0.24],"at":[0.5,0.8,0]}]},"fibre":{"name":"D2B fibre optic loop","d":"Runs from the COMAND along the floor to the boot units and back.","fibre":true,"center":[-0.6,0.4,0]},"cdc":{"name":"CD changer","d":"Boot, left side behind the grey carpet liner, on a metal bracket between the tail light and the rear wheel arch. Black box with a sliding door and an eject button for the 6-disc magazine. Your photo shows its bracket heavily rusted (Gemini chat, PDF p5 to p7).","s":[{"b":[0.26,0.1,0.22],"at":[-2.22,0.74,-0.62]}]},"amp":{"name":"Sound amplifier","d":"Boot, left side behind the trim (Bose amp on Bose cars). Large silver aluminium box with cooling fins, on the same bracket as the CD changer, likely below it (Gemini chat, PDF p5, p7). Model position approximate.","s":[{"b":[0.3,0.2,0.05],"at":[-1.97,0.8,-0.82]}]},"bootMods":{"name":"Phone and voice control modules","d":"Boot, if fitted. Exact position UNVERIFIED.","s":[{"b":[0.2,0.08,0.15],"at":[-2.25,0.66,0.12]}]},"battery":{"name":"Battery","d":"In the boot, right side, under the floor.","s":[{"b":[0.3,0.19,0.18],"at":[-2.15,0.47,0.6]}]},"bootFuse":{"name":"Boot pre-fuse box (X4/22)","d":"Behind the right boot lining, next to the battery (w220.wiki).","s":[{"b":[0.04,0.1,0.14],"at":[-1.98,0.7,0.84]}]},"rearFuse":{"name":"Rear fuse and relay module (K40/5)","d":"Under the right rear seat (w220.wiki).","s":[{"b":[0.22,0.06,0.15],"at":[-0.95,0.5,0.42]}]},"aerialL":{"name":"Aerial amplifier, left","d":"Top of the rear window under the headlining. Exact spot UNVERIFIED.","s":[{"b":[0.1,0.03,0.08],"at":[-1.4,1.28,-0.4]}]},"aerialR":{"name":"Aerial amplifier, right","d":"Top of the rear window under the headlining. Exact spot UNVERIFIED.","s":[{"b":[0.1,0.03,0.08],"at":[-1.4,1.28,0.4]}]}},"cards":[{"id":"F1","g":"fix","title":"Outside temperature sensor","parts":["ambsens"],"where":"Behind the front bumper, low down at the front. On this era of Mercedes it clips behind the lower bumper grille. The exact spot on the W220 is not confirmed.","quote":"TikTok tip 1: \"When your car's air conditioning stops cooling... remove the outside temperature sensor from inside the bumper. Clean the dust off its surface.\"","verdict":"Worth a 5 minute look, but it rarely fixes the AC on its own. The climate control uses this reading to decide how hard to cool. If the dash shows the right outside temperature, the sensor is fine and the real cause is the A/C condenser and gas.","check":["Look at the outside temperature shown on the dash.","Compare it with the real temperature (phone weather app) after 10 minutes of driving.","Within 2 or 3 degrees: the sensor is fine. Go to the A/C condenser card.","Way off, stuck, or blank: the sensor or its plug is the problem."],"fixSteps":["Find the small sensor clipped behind the lower front bumper.","Unplug it. Wipe the sensor and spray the plug with contact cleaner.","Refit and check the dash reading again.","Still wrong: replace the sensor."],"partsList":"Outside air temperature sensor, contact cleaner.","cost":"Clean: free. New sensor: $30 to $90.","diff":"Easy","fx":[{"t":"Sensor clips into its holder: squeeze the tabs and pull, or twist it out","b":"Usual Mercedes practice; the W220 holder was not seen","s":"clip"},{"t":"2-pin connector with a locking tab: press the tab, then pull","s":"plug"},{"t":"Under-tray or lower grille screws if you need room: likely T25 Torx or 8 mm hex, about 4 to 6","s":"screw"}]},{"id":"F2","g":"fix","title":"A/C condenser, gas and compressor","parts":["condenser","acComp","fan","radiator"],"where":"The condenser sits right at the front, in front of the radiator behind the grille. The A/C compressor is on the engine, driven by the belt. The electric fan is behind the radiator.","verdict":"These are the usual real reasons a W220 stops cooling: low gas from a leak (often a stone-damaged condenser), a fan not running, or a worn compressor. Added here because the TikTok tip alone is unlikely to fix it.","check":["Make sure the A/C is really on: on the climate panel the economy (ECON or snowflake off) setting must not be active.","Engine running, A/C on: the electric fan behind the grille should run.","Look at the condenser through the grille for stone dents, oily patches or crushed fins.","Have an A/C shop measure the gas pressures. Low gas means a leak somewhere."],"fixSteps":["Leak test with UV dye, then fix the leak.","Regas to the correct amount.","Leaking condenser: replace it.","Replace the compressor only if it is proven faulty."],"partsList":"R134a gas, UV dye, O-rings. Maybe a condenser or compressor.","cost":"Check and regas: $200 to $450 (NZ adds a levy on R134a). Condenser fitted: $600 to $1,200. Compressor fitted: $1,200 to $2,500.","diff":"Workshop (A/C gear and licence needed)","fx":[{"t":"Condenser pipe joints: block fittings, 1 bolt each (likely 10 mm or Torx). Gas must be recovered first: A/C shop only","s":"fit"},{"t":"Condenser sits on rubber-mounted pegs and clips to the radiator","s":"clip"},{"t":"A/C compressor mounting bolts, 3 or 4, likely 13 mm or E-Torx","s":"bolt"},{"t":"Compressor connector with a locking tab","s":"plug"},{"t":"A/C service ports (L and H) with screw caps, open by hand. Exact spot UNVERIFIED","s":"fit"},{"t":"Belt tensioner: turn it with a spanner or socket on the tensioner bolt (likely 17 mm) to slip the belt off","s":"bolt"},{"t":"Fan connector with a locking tab","s":"plug"},{"t":"Top radiator trim and fan shroud: screws or clips, likely T25 or 8 mm","s":"screw"}]},{"id":"F3","g":"fix","title":"Camshaft solenoids and cam sensor","parts":["camL","camR","engine"],"where":"Front face of the engine, at the top of each cylinder head (one each side of the V).","quote":"TikTok tip 2: \"If your car is hard to start when cold and makes a rattling noise, remove this bolt beneath the oil cap. Pull out the camshaft solenoid valve... clean it thoroughly.\"","verdict":"Not as shown. Your M112 V6 has no plug-in valve under the oil cap. The parts that do this job are bolted to the front of the heads. Their known fault on Mercedes engines of this age is oil seeping out through the electrical plug into the wiring.","check":["Engine cold. Unplug the electrical plugs on the front of each cylinder head.","Look for oil inside the plug or oily wiring.","Get the fault codes read. Camshaft timing codes point here.","A rattle on a cold start can also be the timing chain. Have it listened to."],"fixSteps":["If a plug is oily, replace the leaking part (magnet or sensor).","Clean the plug with contact cleaner and let it dry.","If oil has run a long way up the wiring, have a workshop check the loom."],"partsList":"Cam adjuster magnet or cam position sensor, contact cleaner.","cost":"Code read: $60 to $120. Sensor: $60 to $180. Magnet: $150 to $350.","diff":"Medium","fx":[{"t":"Left magnet: held by bolts, likely 3 Torx (T30 or E8 on similar Mercedes engines). The M112 count is UNVERIFIED","s":"bolt"},{"t":"Right magnet: same as the left, likely 3 Torx bolts","s":"bolt"},{"t":"Left magnet connector: lift the locking tab gently, then pull. Look for oil inside","s":"plug"},{"t":"Right magnet connector: same, check for oil","s":"plug"},{"t":"Engine cover: pulls straight up off rubber grommets, no screws","s":"clip"},{"t":"Cam position sensor: 1 bolt (likely 10 mm or Torx) plus a connector. Position UNVERIFIED","s":"bolt"}]},{"id":"F4","g":"fix","title":"Throttle body (idle problem)","parts":["throttle","intake","airbox"],"where":"Top front centre of the engine, where the big air intake pipe joins.","quote":"TikTok tip 3: \"If fuel consumption increases, the idle becomes unstable and acceleration is poor... remove the idle air control valve from the throttle body. Clean it.\"","verdict":"Not as shown. Your car has an electronic (drive by wire) throttle and no separate idle valve. The same idea still works on the throttle body itself: carbon build-up causes rough idle.","check":["Rough or hunting idle, stalling, or a throttle warning on the dash: likely.","Remove the intake pipe and look at the flap. A black carbon ring means it needs a clean.","Also check the air filter. A blocked filter gives the same symptoms."],"fixSteps":["Ignition OFF and key out.","Remove the intake pipe from the throttle body.","Spray throttle body cleaner on a rag and wipe the bore and flap. Do not force the flap by hand.","Refit, start, and let it idle 5 minutes to relearn."],"partsList":"Throttle body cleaner, rag. Maybe an air filter.","cost":"DIY: $15 to $30. Workshop: $120 to $200.","diff":"Easy to medium","fx":[{"t":"Air duct to throttle body: hose clamp (worm drive, 7 mm or flat blade) or a spring clip","s":"clip"},{"t":"Throttle body to manifold: 4 bolts, likely Torx T30 or 5 mm Allen. Only remove it if cleaning in place is not enough","s":"bolt"},{"t":"Throttle connector with a locking tab. Ignition OFF before you unplug it","s":"plug"},{"t":"Air filter lid: spring clips or screws (likely T25)","s":"clip"},{"t":"Intake duct joints: push-fit with clips","s":"clip"}]},{"id":"F5","g":"fix","title":"Brake booster check valve","parts":["checkValve","brakeRes","booster","masterCyl"],"where":"Back of the engine bay on the driver side (right side on a right-hand drive car), behind the brake fluid reservoir, where the vacuum hose plugs into the round brake booster.","quote":"TikTok tip 4: \"If the brake pedal kicks back and feels soft or hard at different times, locate the brake fluid reservoir. Find this small component behind it... clean off the oil sludge.\"","verdict":"Partly. The part in the video is the vacuum check valve on the brake booster. Checking it is fine, but brakes are safety critical. A soft or changing pedal needs a proper brake check first.","check":["Engine off. Pump the pedal 5 times, hold it down, then start the engine. The pedal should sink a little. If not, booster vacuum is suspect.","Check fluid level and colour in the reservoir. Dark fluid is overdue for a change.","Look at the vacuum hose and check valve for cracks, oil or looseness.","A hissing sound near the pedal points to a booster leak."],"fixSteps":["Cracked or oily check valve or grommet: replace it (cheap).","Brake fluid: flush every 2 years.","Anything else: take it to a brake specialist."],"partsList":"Booster check valve and grommet, DOT 4 brake fluid.","cost":"Check valve: $20 to $70. Fluid flush: $90 to $160.","diff":"Easy check. Brake repairs: workshop.","fx":[{"t":"Check valve: push-fit in a rubber grommet in the booster. Twist and pull. Fit a new grommet","s":"fit"},{"t":"Vacuum hose: push-on, sometimes held by a spring clamp","s":"clip"},{"t":"Reservoir cap: unscrew by hand. Keep dirt out","s":"fit"},{"t":"Fluid level sensor connector","s":"plug"},{"t":"Master cylinder to booster: 2 nuts, likely 13 mm. Workshop job","s":"bolt"},{"t":"Brake pipe nuts, likely 11 mm flare nuts. Workshop job: the brakes must be bled after","s":"fit"}]},{"id":"F6","g":"fix","title":"Oxygen (lambda) sensors","parts":["o2a","o2b","o2c","o2d"],"where":"Underneath the car, screwed into the exhaust pipes. Your V6 has four: two before the catalytic converters and two after.","quote":"TikTok tip 5: \"If your car consumes too much fuel and black smoke comes out of the exhaust... take out the oxygen sensor and clean off the accumulated dust and oil sludge.\"","verdict":"Rarely helps. Cleaning does not bring back a worn oxygen sensor and can damage it. Black smoke on a petrol car means it is running rich, so read the codes first.","check":["Get the fault codes read. Oxygen sensor codes say which one (bank 1 or 2, before or after the cat).","Check the air filter and the air flow (MAF) sensor. Both are cheap causes of rich running.","Listen for exhaust leaks near the front pipes."],"fixSteps":["Replace only the sensor the codes point to.","Use a proper sensor socket and anti-seize on the thread.","Clear the codes and drive."],"partsList":"Oxygen sensor, sensor socket.","cost":"$120 to $300 per sensor. Fitted: $250 to $450.","diff":"Medium (threads often seize)","safety":true,"fx":[{"t":"Left front sensor: 22 mm (7/8 in) sensor socket, M18 x 1.5 thread","b":"Industry standard size for this type of sensor","s":"bolt"},{"t":"Right front sensor: 22 mm sensor socket","b":"Industry standard size","s":"bolt"},{"t":"Left rear sensor: 22 mm sensor socket","b":"Industry standard size","s":"bolt"},{"t":"Right rear sensor: 22 mm sensor socket","b":"Industry standard size","s":"bolt"},{"t":"Sensor plugs: connectors with locking tabs, clipped to a bracket up beside the gearbox","s":"plug"},{"t":"Under-tray screws, likely T25 Torx or 8 mm, about 6 to 10","s":"screw"}]},{"id":"F7","g":"fix","title":"Your data plate (the photo)","parts":["plate"],"where":"Door pillar or door frame, where your photo was taken. Which side and exact spot is UNVERIFIED from the photo.","verdict":"Your photo is the car's identity plate, not a list of faults. It confirms the model, so the parts and locations on this page match your car. The fixes come from the TikTok you sent.","fx":[{"t":"Riveted or glued on. Nothing to undo: leave it in place","s":"clip"}]},{"id":"S1","g":"stereo","title":"COMAND head unit (note the pattern)","parts":["comand"],"where":"Centre of the dashboard. It is the master of the fibre optic audio loop.","check":["When sound drops, does the screen stay on? Screen on, sound gone: the loop or a boot module (the CD changer, amp, phone and fibre loop cards). Whole unit restarts: power or battery (the battery and front audio fuses cards).","Does it happen on radio AND CD? Both: amp, loop or power. Radio only: aerial (the aerial amplifier card).","Note when: over bumps, on hot days, after rain, or when starting. Write it down."],"fixSteps":["Treat the COMAND itself as the last suspect, after every other stereo card.","If proven faulty: specialist repair or a used unit with coding."],"partsList":"Nothing to start with.","cost":"Repair: $300 to $700. Used unit: $200 to $500 plus coding.","diff":"Workshop","fx":[{"t":"Torx screws under the ashtray, likely 2. One W220 owner found these on an Audio 10 radio car; COMAND may differ","b":"MB Club W220 thread (Audio 10, not COMAND)","s":"screw"},{"t":"Screws holding the unit or its frame, likely 2 Torx (same owner report)","s":"screw"},{"t":"Wood trim around the unit: clips. Prise with a plastic trim tool, never a screwdriver","s":"clip"},{"t":"D2B fibre optic plug at the back: the COMAND is on the fibre loop","b":"MB Club 2001 W220 sound thread, InCarTec","s":"fit"},{"t":"Power and speaker connector block and aerial plugs at the back. Disconnect the battery first","s":"plug"}]},{"id":"S2","g":"stereo","title":"Battery, pre-fuse box and charging","parts":["battery","bootFuse","alternator"],"where":"The W220 battery is in the boot, right side, under the floor. The boot pre-fuse box (X4/22) is behind the right boot lining next to it (w220.wiki).","check":["Multimeter: engine off 12.4 to 12.7 V. Engine running 13.8 to 14.6 V.","Most battery shops test free.","Check the terminals and earth strap are tight and clean.","Look at the pre-fuse box for green corrosion or a loose stud nut."],"fixSteps":["Clean and tighten the terminals.","Weak battery: replace it with the correct size and type.","Low charging voltage: have the alternator tested."],"partsList":"Battery if it fails the test.","cost":"Test: free. Battery: $300 to $500.","diff":"Easy","fx":[{"t":"Negative terminal nut, likely 10 mm. Undo the negative first, refit it last","b":"Same-era Mercedes W211 guide uses 10 mm","s":"bolt"},{"t":"Positive terminal nut under the red cover, likely 10 mm","s":"bolt"},{"t":"Hold-down bracket bolt, likely 13 mm","b":"W211 guide uses 13 mm","s":"bolt"},{"t":"Vent hose: push-fit on the battery (an AGM battery has none)","s":"fit"},{"t":"Boot floor panel lifts out. Right side trim is held by plastic nuts or clips","s":"clip"},{"t":"Boot pre-fuse box X4/22 is here, behind the right boot lining","b":"w220.wiki Fuses","s":"fuse"},{"t":"Pre-fuse box: cover clips, big feeds on studs with nuts (likely 10 or 13 mm). Battery off first","s":"bolt"},{"t":"Alternator main cable nut, likely 13 mm, under a rubber boot. Battery off first","s":"bolt"},{"t":"Alternator regulator connector","s":"plug"}]},{"id":"S3","g":"stereo","title":"Audio fuses (front fuse box)","parts":["fuseL"],"where":"Front left fuse box at the back of the engine bay on the left side, under its cover by the windscreen (w220.wiki).","check":["Open the fuse box. The chart in the lid lists radio, CD changer and sound system fuses.","Pull each audio fuse, check it, and push it back in firmly.","Green or white corrosion: clean the slot or replace the fuse."],"fixSteps":["Replace any blown or corroded fuse with the same rating.","A fuse that keeps blowing means a short: workshop."],"partsList":"Mini fuses.","cost":"$5 to $20.","diff":"Easy","fx":[{"t":"Fuse box cover: clips or quarter-turn catches along the edge. Lift it off by hand","s":"clip"},{"t":"F23 7.5 A CD changer, F24 20 A car audio, F25 25 A sound system. Check your lid chart: numbers changed during production","b":"w220.wiki Fuses, left fuse box","s":"fuse"},{"t":"Fuse puller clipped inside the box or lid","s":"clip"}]},{"id":"S4","g":"stereo","title":"Rear fuse module and water check","parts":["rearFuse"],"where":"Rear fuse and relay module K40/5, under the right rear seat (w220.wiki).","check":["Lift the rear seat cushion. Look for damp carpet, water marks or green corrosion.","Check the fuses in this box, including F60 (aerial amplifier).","Also lift the boot floor and side trims and feel for damp."],"fixSteps":["Dry everything out and clean any corrosion.","Find the leak (boot seal, rear window, aerial or tail light seals).","On the W220 the usual causes in that corner are a perished foam seal behind the tail light housing, or blocked rubber drain channels running down from the rear window C-pillar. Fix the leak before fitting any new audio part (Gemini chat, PDF p4)."],"partsList":"Fuses, contact cleaner, maybe seals.","cost":"$0 to $20 to check. Leak repair varies.","diff":"Easy","fx":[{"t":"Rear seat cushion: pull up firmly at the front edge to unclip it","s":"clip"},{"t":"Module K40/5 sits here, under the right rear seat. Aerial amp fuse F60 7.5 A is in it","b":"w220.wiki Fuses","s":"fuse"},{"t":"Module cover: clips","s":"clip"}]},{"id":"S5","g":"stereo","title":"CD changer (prime suspect)","parts":["cdc"],"where":"In the boot, left side, behind the grey carpet liner. Not right against the tail light: pull the liner further back toward the rear wheel arch to find the metal bracket it sits on (Gemini chat, PDF p6). Your photo shows it there (PDF p7).","check":["Remove the left boot trim. Look for damp or corrosion on the changer and plugs.","Eject test: car and radio on, press the eject button on the changer. No whirring and the magazine stays in: the changer has no power or is dead, and that breaks the loop (Gemini chat, PDF p3, p5, p7).","Bypass test: unplug the changer and join its two fibre ends with a D2B loop connector.","Use the car for a week. Problem gone: the changer was the fault."],"fixSteps":["Leave it bypassed (you lose the CD changer only), or fit a good used changer.","Keep fibre ends clean and never bend the fibre tightly."],"partsList":"D2B fibre bypass loop connector (ask Mercedes parts or an audio shop), or a used changer.","cost":"Bypass: $20 to $60. Used changer: $80 to $250.","diff":"Easy to medium","fx":[{"t":"Left boot side trim: plastic nuts, push clips and the bag hook screws. Lift the boot floor first","s":"clip"},{"t":"Changer bracket: 3 or 4 nuts or screws, likely 10 mm or T25","s":"bolt"},{"t":"D2B fibre plug (two fibres): the changer is on the fibre loop. Unplug here for the bypass test","b":"MB Club, InCarTec","s":"fit"},{"t":"Power connector with a locking tab","s":"plug"}]},{"id":"S6","g":"stereo","title":"Sound amplifier","parts":["amp"],"where":"In the boot, left side behind the trim, on the same bracket as the CD changer, likely directly below it, deeper in the cavity (Gemini chat, PDF p5, p7). Bose-equipped cars have the Bose amp here.","check":["Look for damp or water stains around the amp and its plugs.","Feel the foam and floor under the bracket. Damp, wet or a mildew smell: dry it out now, water shorts the amp (Gemini chat, PDF p2, p3).","Car off, key out. Unplug each amp harness and look at the pins: green, white, rusty or burnt pins mean a failing connection. Push each plug back until it clicks, then test the sound (Gemini chat, PDF p1, p3, p7).","Feel if it is very hot after a long drive.","A workshop with Mercedes diagnosis can see which unit breaks the loop."],"fixSteps":["Dry and clean if damp.","Faulty amp: repair or a used one with the same part number.","If bypassing the CD changer does not bring the sound back, or the amp plugs are badly corroded, the amp needs replacing (Gemini chat, PDF p7)."],"partsList":"Used amp with matching part number.","cost":"$150 to $500.","diff":"Medium","fx":[{"t":"Amp mounting: 3 or 4 nuts, likely 10 mm","s":"bolt"},{"t":"D2B fibre plug: the amp is on the fibre loop","b":"MB Club, MBWorld","s":"fit"},{"t":"Power and speaker connectors with locking levers. Reseat firmly until they click and check the pins for corrosion","b":"Gemini chat, PDF p1, p3, p7","s":"plug"}]},{"id":"S7","g":"stereo","title":"Phone and voice control modules","parts":["bootMods"],"where":"In the boot, behind the trim (if fitted). Exact position on your car is UNVERIFIED.","check":["Find which modules are fitted (look for fibre optic plugs, usually orange or black twin fibres).","Bypass each one in turn, as with the CD changer."],"fixSteps":["A dead phone module you never use can stay bypassed."],"partsList":"D2B loop connector.","cost":"$20 to $60.","diff":"Easy to medium","fx":[{"t":"Module bracket screws, likely T25 or 10 mm","s":"screw"},{"t":"Fibre plug if this unit is on the loop (look for twin orange or black fibres)","s":"fit"}]},{"id":"S8","g":"stereo","title":"Fibre optic audio loop (D2B)","parts":["fibre"],"where":"Runs from the COMAND under the centre console and floor to the boot modules and back.","check":["System on: gently unplug a fibre plug in the boot. Red light should come out of one fibre.","No red light: the break is before that point.","Make sure every plug is fully clipped in."],"fixSteps":["Reseat plugs and clean the fibre ends with a lint-free cloth.","Replace any damaged fibre section."],"partsList":"Fibre repair section if needed.","cost":"$0 to $150. Workshop loop test: $120 to $200.","diff":"Medium","fx":[{"t":"Sill and centre console trims: push clips. The fibre runs underneath","s":"clip"},{"t":"Inline fibre joint where the loop enters the boot","s":"fit"}]},{"id":"S9","g":"stereo","title":"Radio aerial amplifiers","parts":["aerialL","aerialR"],"where":"The radio aerial is in the rear window. Its amplifiers are near the top of the rear window under the headlining. Exact spot UNVERIFIED.","check":["Does it drop in the same places each time? That is normal reception.","Drops anywhere, even in town: check the aerial amp plug and fuse F60 (the rear fuse module card)."],"fixSteps":["Reseat plugs, replace the aerial amplifier if faulty."],"partsList":"Aerial amplifier.","cost":"$80 to $300.","diff":"Medium","fx":[{"t":"Rear headlining edge and C-pillar trims: push clips. Prise gently, they break when cold","s":"clip"},{"t":"Left aerial amp: 1 or 2 screws, likely T20 or 7 mm","s":"screw"},{"t":"Right aerial amp: 1 or 2 screws, likely T20 or 7 mm","s":"screw"},{"t":"Aerial coax plugs, push-in type","s":"plug"},{"t":"Aerial amp fuse F60 7.5 A, in the module under the right rear seat","b":"w220.wiki Fuses","s":"fuse"}]},{"id":"A1","g":"air","title":"Level button: the raise test","parts":["lvlBtn"],"where":"The ride height button with the car and up arrow symbol, in the centre console area. Exact spot UNVERIFIED.","check":["Engine running, press the level button once. The car should rise within about 30 seconds.","Listen at the front right bumper. You should hear the compressor hum.","Note the dash message. \"AIRMATIC VISIT WORKSHOP\" means a fault is stored. \"Car too low\" or \"Stop car too low\" means it cannot hold or build pressure.","Park on flat ground overnight. Measure each wheel arch to the ground before and after."],"fixSteps":["No hum: go to the compressor relay and fuse card.","Hum but slow or no rise: the compressor, valve block and strut cards.","Sinks overnight: the low corner points to the leak."],"partsList":"Tape measure.","cost":"Free.","diff":"Easy","safety":true,"fx":[{"t":"Nothing to undo for the test. The switch prises out of the console with a trim tool if it ever needs replacing","s":"clip"}]},{"id":"A2","g":"air","title":"Compressor relay O and fuse F32","parts":["fuseR"],"where":"Front right fuse box at the back of the engine bay on the right side. Relay position \"O\", fuse F32 (40 A) (w220.wiki).","check":["Pull fuse F32 and check it.","Swap relay O with an identical relay, or fit a new one.","Repeat the raise test (the level button card)."],"fixSteps":["Replace the relay. Always fit a new relay when replacing the compressor.","Fuse blows again: find the short or a seized compressor."],"partsList":"Airmatic compressor relay (w220.wiki lists A 002 542 13 19), 40 A fuse.","cost":"Relay: $40 to $120. Fuse: $5.","diff":"Easy","fx":[{"t":"Fuse box cover: clips or quarter-turn catches. Lift it off by hand","s":"clip"},{"t":"Fuse F32, 40 A: air suspension compressor","b":"w220.wiki Fuses","s":"fuse"},{"t":"Relay O: switches the Airmatic compressor","b":"w220.wiki Fuses","s":"fuse"},{"t":"The relay pulls straight up. Rock it gently, no tools needed","s":"clip"}]},{"id":"A3","g":"air","title":"Airmatic compressor","parts":["amComp"],"where":"Front right, behind the bumper below the headlight. Reached through the wheel arch liner.","check":["During the raise test: no hum and relay is good, check for power at its plug.","Hum but slow rise: worn compressor or a leak.","Hot and cutting out: suspect a leak making it overwork."],"fixSteps":["Fix any leak first.","Replace the compressor and the relay together."],"partsList":"Airmatic compressor, relay.","cost":"Aftermarket compressor: $400 to $900. Fitted: $700 to $1,300.","diff":"Medium to workshop","safety":true,"fx":[{"t":"Front right wheel: 5 wheel bolts, 17 mm. Use the torque in your handbook","b":"Mercedes standard wheel bolt size","s":"bolt"},{"t":"Front right wheel arch liner: plastic clips and nuts. Sizes UNVERIFIED","b":"General Mercedes compressor guide (youcanic)","s":"clip"},{"t":"Compressor held by 3 bolts on a bracket. They rust: soak them in penetrating oil first. Bolt size UNVERIFIED","b":"W220 owner, MB Club","s":"bolt"},{"t":"Air line: threaded fitting, turn anticlockwise. Release pressure first","b":"General Mercedes guide","s":"fit"},{"t":"Compressor power connector (and temperature sensor plug) with locking tabs","s":"plug"}]},{"id":"A4","g":"air","title":"Valve block","parts":["valveBlk"],"where":"Next to the compressor, front right. Exact mounting UNVERIFIED.","check":["Compressor running: spray soapy water on the block and its pipe joints. Bubbles mean a leak."],"fixSteps":["Replace the valve block or reseal the leaking fitting."],"partsList":"Valve block or fittings.","cost":"$300 to $700 for the part.","diff":"Medium","fx":[{"t":"Valve block connector with a locking tab","s":"plug"},{"t":"Air line fittings, about 5 (one per strut, the tank, the supply). Soapy-water test each one","s":"fit"},{"t":"Mounting nuts, likely 10 mm","s":"bolt"}]},{"id":"A5","g":"air","title":"Front air struts","parts":["strutFL","strutFR"],"where":"Inside each front wheel arch. The top is under the bonnet on the strut tower.","check":["Measure arch heights in the evening and again in the morning.","Spray soapy water on the strut top and its air fitting (bonnet open)."],"fixSteps":["Replace the leaking strut.","Check the air fitting on top at the same time."],"partsList":"Front Airmatic strut.","cost":"Aftermarket: $500 to $900 each. Fitted: $800 to $1,300 each. Genuine costs more.","diff":"Workshop","safety":true,"fx":[{"t":"Right strut top: nuts on the strut tower under the bonnet, likely 3","s":"bolt"},{"t":"Left strut top: nuts on the strut tower, likely 3","s":"bolt"},{"t":"Right air inlet with a brass residual pressure holding valve. A special socket exists for it. Never undo it under pressure","b":"w220.wiki Special tools","s":"fit"},{"t":"Left air inlet with a brass residual pressure holding valve","b":"w220.wiki Special tools","s":"fit"},{"t":"Right lower strut bolt to the control arm. Workshop torque","s":"bolt"},{"t":"Left lower strut bolt to the control arm","s":"bolt"},{"t":"Wheel bolts x5 each side, 17 mm","b":"Mercedes standard wheel bolt size","s":"bolt"}]},{"id":"A6","g":"air","title":"Rear air struts","parts":["strutRL","strutRR"],"where":"Inside each rear wheel arch.","check":["Measure arch heights over about 10 hours without moving the car.","Soapy water on the air fitting at the top."],"fixSteps":["Replace the leaking strut."],"partsList":"Rear Airmatic strut.","cost":"$400 to $800 each. Fitted: $650 to $1,100 each.","diff":"Workshop","safety":true,"fx":[{"t":"Right top mount nuts, reached from inside the boot or under the parcel shelf","s":"bolt"},{"t":"Left top mount nuts, same access","s":"bolt"},{"t":"Right air inlet with a brass residual pressure holding valve","b":"w220.wiki: one at each air inlet","s":"fit"},{"t":"Left air inlet with a brass residual pressure holding valve","b":"w220.wiki: one at each air inlet","s":"fit"},{"t":"Right lower strut bolt","s":"bolt"},{"t":"Left lower strut bolt","s":"bolt"}]},{"id":"A7","g":"air","title":"Level sensors","parts":["lvlFL","lvlFR","lvlR"],"where":"Three of them: one on each front lower arm and one on the rear axle.","check":["Look under each one for a snapped or loose link rod.","A workshop can read each sensor's value with Mercedes diagnosis."],"fixSteps":["Replace the link rod or sensor."],"partsList":"Level sensor or link rod.","cost":"$150 to $400.","diff":"Medium","safety":true,"fx":[{"t":"Front right sensor: 2 bolts, likely 10 mm. The link rod pops off its ball joint","s":"bolt"},{"t":"Front left sensor: 2 bolts, likely 10 mm, plus the link rod","s":"bolt"},{"t":"Front right sensor connector","s":"plug"},{"t":"Front left sensor connector","s":"plug"},{"t":"Rear sensor: 2 bolts, likely 10 mm, plus the link rod","s":"bolt"},{"t":"Rear sensor connector","s":"plug"}]},{"id":"A8","g":"air","title":"Pressure reservoir","parts":["reservoir"],"where":"Front left, behind the bumper.","check":["Soapy water on its fitting and pipe while the compressor runs."],"fixSteps":["Reseal or replace the fitting."],"partsList":"Fitting or reservoir.","cost":"$200 to $500.","diff":"Medium","fx":[{"t":"Tank strap or mounting nuts, likely 10 mm","s":"bolt"},{"t":"Air line fitting: soapy-water test it","s":"fit"}]},{"id":"D1","g":"scan","title":"Suction fan circuit (two fan fault codes): do this first","parts":["fanCtl"],"where":"Behind the radiator, inside the fan shroud. The fan, its built-in control module and the 4-pin plug are one unit.","verdict":"The fan open circuit code says the engine computer sees an open circuit on the electric suction fan. The fan output code says the A/C asked for a fan speed that did not make sense, and tells you to check the suction fan. Both point at the same part. My best read is that the open circuit causes the \"implausible fan output\", so fixing the fan should clear both. I am about 70% sure. No source ties these two codes together directly.","check":["Engine warm, A/C on: stand at the front. Does the fan run at all? Run it for a few minutes. Note whether it runs slowly, fast, or not at all.","Wiggle the fan plug and its wires by hand with the fan running. A stutter or stop points at the plug or wiring.","Look at the 4-pin plug for green or burnt pins. Clean with contact cleaner.","Engine off, plug off, ignition on: with a multimeter check the ground, 12 V constant and 12 V ignition pins (w220.wiki lists the wire roles).","All three good but the fan never runs: the fan unit or its module is bad. Replace the fan as one unit.","Speed signal missing from the engine computer side: wiring or ME2 fault. This is rarer. Have a workshop trace it."],"fixSteps":["Repair the plug or wiring if you find damage.","Otherwise fit a new fan unit. Part number is UNCONFIRMED for your S320: w220.wiki lists A 220 500 01 93 (600 W) for the S500, S450 and S350. Check it against your chassis number.","Clear the codes. Drive and run the A/C. Rescan the engine module AND the A/C module (see the fix order)."],"partsList":"Suction fan unit with built-in module. OE A 220 500 01 93 listed for other W220 petrol models (w220.wiki). UNCONFIRMED for the S320.","cost":"Rough guess only: used fan $150 to $400, new $400 to $900, fitting 1 to 2 hours.","diff":"Medium. Shroud and fan come out from the top.","fx":[]},{"id":"D2","g":"scan","title":"A/C compressor torque code","parts":["acComp"],"where":"The compressor is low on the engine, belt driven (see the A/C condenser and gas card). The scan text says to see the A/C control module.","verdict":"The compressor torque code \"AC compressor torque implausible\", stored. The W220 compressor is a variable displacement unit with no magnetic clutch (w220.wiki), so the engine computer has to estimate how much load the A/C puts on the engine. If the A/C pressure reading is off, or the condenser is not being cooled because the fan is dead, that estimate can look wrong. That is a theory, UNCONFIRMED. Do not buy a compressor for this code.","check":["Fix the suction fan circuit first, clear codes, drive, rescan.","If the compressor torque code returns: read the A/C module live data and compare the refrigerant pressure with a manifold gauge on the high side (see the A/C pressure card).","Pressures good and the code stays: only then look at the compressor."],"fixSteps":["Replace the compressor only if it is proven faulty (the A/C condenser and gas card)."],"partsList":"None until proven.","cost":"None until proven. Compressor fitted: $1,200 to $2,500 (v6 figure).","diff":"Workshop (A/C gear and licence needed)","fx":[]},{"id":"D3","g":"scan","title":"A/C refrigerant pressure sensor B12 (no code for it in this scan)","parts":["acPress","acTemp","recDrier"],"where":"On the receiver drier, front left of the engine bay, right next to the refrigerant temperature sensor B12/1. The A/C shop must empty the gas before it is swapped.","verdict":"Plainly: this scan holds NO refrigerant pressure sensor code. The A/C module (AAC/TAC) is not in the list of 27 systems the tool found, so it was never read, and a sensor fault would be stored there, not in the engine module. So there is no proof the sensor is bad. It is only a suspect because the compressor torque code and the fan output code are both A/C-related. Test it before you buy it.","check":["Rescan, including the A/C module.","Live pressure against a gauge (see above).","Fix the suction fan circuit first. A dead fan alone can make A/C pressures and the torque estimate look wrong."],"fixSteps":["Only if the sensor is proven wrong: recover the gas, swap the sensor with a new O-ring, evacuate and regas."],"partsList":"Pressure sensor B12: genuine A 639 542 08 18 (supersedes A 140 830 00 72), or Thermotec KTT130013, NRF 38941, Hella 6ZL 351 028-161, Mahle ASE 17 000P, Denso DPS17003. Not confirmed against your chassis number. Plus O-ring and R134a gas (3 candidate numbers above, all UNCONFIRMED).","cost":"Rough guess only: sensor $40 to $150, A/C shop recover and regas $200 to $450 (v6 figure).","diff":"Workshop (the gas has to be recovered)","fx":[]},{"id":"D4","g":"scan","title":"Coolant thermostat (thermostat code, current)","parts":["thermo"],"where":"In the thermostat housing at the front of the engine, on the coolant pipes. The exact spot on the M112 is UNVERIFIED.","verdict":"The thermostat code, shown as \"Coolant thermostat\", status stored AND current. It is the only code active right now. The usual meaning of this code is that the engine is not reaching its proper temperature fast enough, most often a thermostat stuck open. That is the generic meaning, not a Mercedes document. It does not look related to the fan or A/C codes.","check":["Live coolant temperature on a drive.","Dash gauge versus scan reading.","Heater output once warm."],"fixSteps":["Engine cold. Drain some coolant, replace the thermostat and its seal, refill with the correct Mercedes coolant and bleed the system.","Clear the code and drive. If it comes back, check the coolant temperature sensor."],"partsList":"Thermostat (A 112 203 02 75, UNCONFIRMED for your car), seal, coolant.","cost":"Rough guess only: part $30 to $100, fitted $250 to $500.","diff":"Medium","fx":[]}]}</script>
+<script type="module">
+import * as THREE from 'three';
+import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
+import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';
+import {DRACOLoader} from 'three/addons/loaders/DRACOLoader.js';
+import {mergeGeometries} from 'three/addons/utils/BufferGeometryUtils.js';
+import {Reflector} from 'three/addons/objects/Reflector.js';
+
+function P_RM_FORCE(){return false}
+const D=JSON.parse(document.getElementById('data').textContent);
+const PARTS=D.parts, CARDS=D.cards;
+/* r6-real: part positions were authored for a placeholder body. Deltas [dx,dy,dz] in car space (x forward, y up, z right, metres)
+   move each part onto the real W220 mesh (bboxes read from model/scene.gltf nodes: engine v8/v12 x1.3-2.2 y.5-1.15, radiator x2.16-2.44 y.45-.95,
+   hood_2 y.74-1.23, door_FL/RL seam x-.15, rear lid x-2.49..-1.71, dash/pedals x.9-1.1). Applied before BOX/CEN so pins, flights and shapes agree. */
+const ADJ={engine:[.2,.25,0],intake:[.2,.12,0],throttle:[.2,.15,0],camL:[.2,.2,0],camR:[.2,.2,0],acComp:[.15,.25,0],thermo:[.2,.3,0],alternator:[.15,.25,0],
+ radiator:[.06,.18,0],fan:[.06,.18,0],condenser:[.06,.18,0],acPress:[.04,.2,0],ambsens:[-.05,.2,0],airbox:[.06,.2,0],amComp:[.06,.2,0],valveBlk:[.06,.2,0],reservoir:[.06,.2,0],fanCtl:[.06,.18,0],
+ booster:[.2,.14,0],masterCyl:[.2,.14,0],brakeRes:[.2,.14,0],checkValve:[.2,.14,0],fuseL:[.22,.1,-.06],fuseR:[.22,.1,.06],
+ o2a:[.1,.08,0],o2b:[.1,.08,0],o2c:[.1,.1,0],o2d:[.1,.1,0],
+ strutFL:[0,.1,0],strutFR:[0,.1,0],strutRL:[0,.1,0],strutRR:[0,.1,0],lvlFL:[0,.1,0],lvlFR:[0,.1,0],lvlR:[0,.12,0],
+ plate:[.31,.03,-.03],lvlBtn:[.15,.07,0],comand:[.48,.3,0],
+ cdc:[.12,.13,0],amp:[0,.12,-.05],bootMods:[.1,.2,0],battery:[.1,.35,0],bootFuse:[.1,.2,0],rearFuse:[0,.12,0],aerialL:[-.15,.2,0],aerialR:[-.15,.2,0]};
+Object.entries(ADJ).forEach(([id,d])=>{const p=PARTS[id];if(!p)return;p.adj=d;(p.s||[]).forEach(s=>{if(s.at)s.at=s.at.map((v,i)=>v+d[i]);if(s.tube)s.tube=s.tube.map((q,j)=>j<2?q.map((v,i)=>v+d[i]):q)})});
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const mqRM=matchMedia('(prefers-reduced-motion:reduce)');let RM=mqRM.matches;mqRM.addEventListener&&mqRM.addEventListener('change',e=>{RM=e.matches});if(P_RM_FORCE())RM=true;
+const P=new URLSearchParams(location.search);
+const GN={fix:'TikTok fixes',stereo:'Stereo cutting out',air:'Air suspension',scan:'Scan 16 Nov'};
+const GC={fix:'#ffb547',stereo:'#3fd0ff',air:'#ff6fae',scan:'#c39bff',none:'#9aa6b4'};
+const mobile=()=>innerWidth<=700;
+
+const cardsByPart={};
+CARDS.forEach(c=>(c.parts||[]).forEach(id=>(cardsByPart[id]??=[]).push(c)));
+const groupOf=id=>(cardsByPart[id]||[])[0]?.g||'none';
+const ALIAS={
+ stereo:['comand','cdc','amp','fibre','bootMods','aerialL','aerialR','battery','bootFuse','rearFuse','fuseL'],radio:['comand','aerialL','aerialR','amp'],audio:['comand','amp','cdc','fibre','fuseL'],
+ 'fuse box':['fuseL','fuseR','bootFuse','rearFuse'],fuse:['fuseL','fuseR','bootFuse','rearFuse'],
+ 'rear strut':['strutRL','strutRR'],'front strut':['strutFL','strutFR'],strut:['strutFL','strutFR','strutRL','strutRR'],suspension:['amComp','valveBlk','reservoir','strutFL','strutFR','strutRL','strutRR','lvlFL','lvlFR','lvlR','lvlBtn'],airmatic:['amComp','valveBlk','reservoir','strutRL','strutRR'],'ride height':['lvlBtn','lvlFL','lvlFR','lvlR'],
+ idle:['throttle','intake','airbox'],shake:['throttle','camL','camR','engine'],'rough idle':['throttle','camL','camR'],misfire:['camL','camR','engine'],
+ ac:['condenser','acComp','fan','fanCtl','acPress'],'air con':['condenser','acComp','fan','fanCtl','acPress'],'cooling fan':['fan','fanCtl'],battery:['battery','bootFuse'],brake:['booster','masterCyl','brakeRes','checkValve'],lambda:['o2a','o2b','o2c','o2d'],'cd changer':['cdc'],
+};
+function shapeBox(id){
+ const p=PARTS[id];const b=new THREE.Box3();
+ if(p.fibre){return new THREE.Box3(new THREE.Vector3(-2.3,.4,-.7),new THREE.Vector3(1.0,1.1,.7));}
+ (p.s||[]).forEach(s=>{const a=s.at||[0,0,0];let h=[.05,.05,.05];
+  if(s.b)h=s.b.map(v=>v/2);else if(s.c){const r=s.c[0],hh=s.c[1]/2;h=s.c[2]==='x'?[hh,r,r]:s.c[2]==='z'?[r,r,hh]:[r,hh,r];}
+  else if(s.tube){const [p1,p2]=s.tube;b.expandByPoint(new THREE.Vector3(...p1));b.expandByPoint(new THREE.Vector3(...p2));return}
+  b.expandByPoint(new THREE.Vector3(a[0]-h[0],a[1]-h[1],a[2]-h[2]));b.expandByPoint(new THREE.Vector3(a[0]+h[0],a[1]+h[1],a[2]+h[2]));});
+ return b;
+}
+const BOX={},CEN={};
+Object.keys(PARTS).forEach(id=>{BOX[id]=shapeBox(id);CEN[id]=BOX[id].getCenter(new THREE.Vector3());});
+
+const S={sel:null,view:'solid',sys:null,hits:null,p:0,e:0,offX:0,offY:0,offXT:0,offYT:0,modelLoaded:false,ready:false,paint:0};
+let floor=null,lastAct=performance.now(),turnMs=0,lastT=0;function noteAct(){lastAct=performance.now();turnMs=0}
+let renderer,scene,camera,controls,car,shell,internals,pins={},pinList=[],shellMats=[],segs=[],dirty=true;
+const tweens=[];
+const ease=t=>t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2;
+function tween(dur,fn,done){if(RM||!renderer){fn(1);done&&done();dirty=true;return}tweens.push({t0:performance.now(),dur,fn,done})}
+
+const stage=$('#stage');
+function studioEnv(){ /* soft-box studio: dark room, overhead panel, two side strips, front and back strips; gives clearcoat long clean highlights */
+ const e=new THREE.Scene();
+ const room=new THREE.Mesh(new THREE.BoxGeometry(34,16,34),new THREE.MeshBasicMaterial({color:0x303846,side:THREE.BackSide}));room.position.y=7;e.add(room);
+ const L=(w,h,x,y,z,rx,ry,k,col)=>{const m=new THREE.Mesh(new THREE.PlaneGeometry(w,h),new THREE.MeshBasicMaterial({color:new THREE.Color(col).multiplyScalar(k),side:THREE.DoubleSide,toneMapped:false}));m.position.set(x,y,z);m.rotation.set(rx,ry,0);e.add(m)};
+ L(20,9,0,14.5,0,Math.PI/2,0,9,0xfff2e2);
+ L(2.4,9,-16.5,7,0,0,Math.PI/2,5.5,0xdfeaff);L(2.4,9,16.5,7,0,0,Math.PI/2,4.5,0xffffff);
+ L(12,1.8,0,4.5,-16.5,0,0,4,0xffffff);L(12,1.8,0,3.5,16.5,0,0,3,0xffe6cc);
+ L(18,.5,0,.4,0,Math.PI/2,0,1.2,0x6f7d92);
+ return e}
+function initGL(){
+ try{renderer=new THREE.WebGLRenderer({antialias:true,powerPreference:'high-performance'});}
+ catch(e){console.warn('webgl',e);$('#nogl').style.display='grid';return false}
+ renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+ renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=.92;
+ renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;
+ stage.appendChild(renderer.domElement);
+ renderer.domElement.addEventListener('webglcontextlost',e=>{e.preventDefault();$('#nogl').style.display='grid'});
+ scene=new THREE.Scene();scene.background=new THREE.Color(0x0a0c10);
+ const pm=new THREE.PMREMGenerator(renderer);scene.environment=pm.fromScene(studioEnv(),.02).texture;scene.environmentIntensity=1.0;
+ camera=new THREE.PerspectiveCamera(30,1,.1,80);
+ controls=new OrbitControls(camera,renderer.domElement);
+ controls.enableDamping=true;controls.dampingFactor=.07;controls.minDistance=1.2;controls.maxDistance=34;controls.maxPolarAngle=Math.PI*.495;controls.enablePan=true;controls.screenSpacePanning=true;
+ controls.addEventListener('change',()=>dirty=true);controls.autoRotateSpeed=.9;controls.addEventListener('start',()=>noteAct());
+ const key=new THREE.DirectionalLight(0xfff4e6,2.2);key.position.set(4,6.5,3);key.castShadow=true;key.shadow.mapSize.set(2048,2048);
+ Object.assign(key.shadow.camera,{left:-4,right:4,top:4,bottom:-4,near:1,far:18});key.shadow.bias=-.0004;key.shadow.normalBias=.03;key.shadow.radius=6;scene.add(key);
+ const rim=new THREE.DirectionalLight(0x8fb4ff,1.6);rim.position.set(-5,2.5,-4);scene.add(rim);
+ const cv=document.createElement('canvas');cv.width=cv.height=256;const g=cv.getContext('2d');const gr=g.createRadialGradient(128,128,0,128,128,128);gr.addColorStop(0,'rgba(10,12,16,.66)');gr.addColorStop(.35,'rgba(10,12,16,.78)');gr.addColorStop(.7,'rgba(10,12,16,.95)');gr.addColorStop(.92,'rgba(10,12,16,1)');gr.addColorStop(1,'rgba(10,12,16,1)');g.fillStyle=gr;g.fillRect(0,0,256,256);
+ const tex=new THREE.CanvasTexture(cv);tex.colorSpace=THREE.SRGBColorSpace;
+ const pool=new THREE.Mesh(new THREE.PlaneGeometry(15,15),new THREE.MeshBasicMaterial({map:tex,transparent:true,depthWrite:false,toneMapped:false}));pool.rotation.x=-Math.PI/2;pool.position.y=-.002;pool.renderOrder=1;scene.add(pool);
+ try{const dpr=Math.min(devicePixelRatio,1.5);const rf=new Reflector(new THREE.PlaneGeometry(15,15),{clipBias:.003,textureWidth:Math.round(innerWidth*dpr*.6),textureHeight:Math.round(innerHeight*dpr*.6),color:0x8a93a1});rf.rotation.x=-Math.PI/2;rf.position.y=-.006;rf.renderOrder=0;scene.add(rf);floor=rf;const ob=rf.onBeforeRender;rf.onBeforeRender=function(...a){const v=pinList.map(sp=>sp.visible);pinList.forEach(sp=>sp.visible=false);ob.apply(this,a);pinList.forEach((sp,i)=>sp.visible=v[i])}}catch(e){console.warn('reflector',e)}
+ const sh=new THREE.Mesh(new THREE.PlaneGeometry(15,15),new THREE.ShadowMaterial({opacity:.5,depthWrite:false}));sh.rotation.x=-Math.PI/2;sh.receiveShadow=true;sh.renderOrder=2;scene.add(sh);
+ car=new THREE.Group();scene.add(car);shell=new THREE.Group();internals=new THREE.Group();internals.visible=false;car.add(shell,internals);
+ return true;
+}
+
+const PAINTS=[['Pearl silver',0xa4aab3,.9,.3],['Obsidian black',0x0e1014,.55,.2],['Midnight blue',0x203a68,.75,.22],['Pearl white',0xe4e1da,.35,.3]];
+const paintMat=new THREE.MeshPhysicalMaterial({color:PAINTS[0][1],metalness:PAINTS[0][2],roughness:PAINTS[0][3],clearcoat:1,clearcoatRoughness:.025,envMapIntensity:1.5});
+const glassMat=new THREE.MeshPhysicalMaterial({color:0x1c2a3b,metalness:.1,roughness:.06,clearcoat:1,clearcoatRoughness:.03,envMapIntensity:2.4});
+const paintMats=[paintMat];
+function setPaint(i){S.paint=i;const [,c,m,r]=PAINTS[i];paintMats.forEach(pm=>{pm.color.setHex(c);pm.metalness=m;pm.roughness=r});dirty=true;
+ document.querySelectorAll('.sw').forEach((b,j)=>b.setAttribute('aria-pressed',j===i))}
+function regShell(m){shellMats.push({m,base:m.opacity??1});return m}
+
+function buildPlaceholder(){
+ const g=new THREE.Group();g.name='placeholder';
+ shellMats.push({m:paintMat,base:1});
+ const glass=regShell(new THREE.MeshPhysicalMaterial({color:0x1b2430,metalness:.6,roughness:.08,clearcoat:1}));
+ const trim=regShell(new THREE.MeshStandardMaterial({color:0x14161a,roughness:.5,metalness:.4}));
+ const tub=regShell(new THREE.MeshStandardMaterial({color:0x15181d,roughness:.9}));
+ const tyre=regShell(new THREE.MeshStandardMaterial({color:0x0c0c0e,roughness:.85}));
+ const rim=regShell(new THREE.MeshStandardMaterial({color:0xc9ced5,roughness:.25,metalness:1}));
+ const lampF=regShell(new THREE.MeshStandardMaterial({color:0xdfe6ee,roughness:.1,metalness:.3,emissive:0x6a7380,emissiveIntensity:.5}));
+ const lampR=regShell(new THREE.MeshStandardMaterial({color:0x8a0f1a,roughness:.2,emissive:0x5a0008,emissiveIntensity:.8}));
+ const lin=(pts)=>x=>{for(let i=0;i<pts.length-1;i++){const[a,b]=[pts[i],pts[i+1]];if(x<=a[0]&&x>=b[0]||x>=a[0]&&x<=b[0]){const t=(x-a[0])/((b[0]-a[0])||1);return a[1]+(b[1]-a[1])*t}}return pts[pts.length-1][1]};
+ const hoodY=lin([[1.15,.98],[2.0,.9],[2.35,.8],[2.5,.68],[2.56,.5]]);
+ const bootY=lin([[-.95,.98],[-2.1,1.03],[-2.45,.97],[-2.56,.62]]);
+ function seg(name,x0,x1,zc,w,fn,mat,botY,off){
+  const n=Math.max(3,Math.ceil((x1-x0)/.07));const sh=new THREE.Shape();sh.moveTo(x0,botY);
+  for(let i=0;i<=n;i++){const x=x0+(x1-x0)*i/n;sh.lineTo(x,fn(x))}sh.lineTo(x1,botY);sh.closePath();
+  const ge=new THREE.ExtrudeGeometry(sh,{depth:w,bevelEnabled:true,bevelSize:.09,bevelThickness:.1,bevelSegments:6});ge.translate(0,0,zc-w/2);
+  const m=new THREE.Mesh(ge,mat);m.castShadow=true;const grp=new THREE.Group();grp.name=name;grp.add(m);g.add(grp);segs.push({grp,off:new THREE.Vector3(...(off||[0,0,0]))});return grp}
+ const hood=seg('hood',1.12,2.56,0,1.78,hoodY,paintMat,.27,[.35,.95,0]);
+ const boot=seg('boot',-2.56,-.92,0,1.78,bootY,paintMat,.27,[-.35,.85,0]);
+ seg('doorL',-.95,1.15,-.72,.36,()=>.98,paintMat,.27,[0,.15,-1.15]);
+ seg('doorR',-.95,1.15,.72,.36,()=>.98,paintMat,.27,[0,.15,1.15]);
+ const core=seg('cabinTub',-.9,1.1,0,1.1,()=>.62,tub,.27);
+ const bx=(w,h,d,x,y,z,mat,par)=>{const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),mat);m.position.set(x,y,z);m.castShadow=true;par.add(m);return m};
+ bx(.5,.3,.42,-.1,.74,-.28,trim,core);bx(.5,.3,.42,-.1,.74,.28,trim,core);bx(.12,.5,.9,-.38,.95,0,trim,core);bx(.35,.22,1.0,.62,.74,0,trim,core);
+ const roof=new THREE.Group();g.add(roof);segs.push({grp:roof,off:new THREE.Vector3(0,1.25,0)});
+ const gs=new THREE.Shape();gs.moveTo(1.0,.96);gs.lineTo(.38,1.4);gs.lineTo(-1.2,1.42);gs.lineTo(-1.88,1.0);gs.closePath();
+ const gg=new THREE.Mesh(new THREE.ExtrudeGeometry(gs,{depth:1.46,bevelEnabled:true,bevelSize:.04,bevelThickness:.04,bevelSegments:2}),glass);gg.geometry.translate(0,0,-.73);gg.castShadow=true;roof.add(gg);
+ const rs=new THREE.Shape();rs.moveTo(.4,1.395);rs.lineTo(-1.2,1.415);rs.lineTo(-1.2,1.47);rs.lineTo(.4,1.45);rs.closePath();
+ const rr=new THREE.Mesh(new THREE.ExtrudeGeometry(rs,{depth:1.4,bevelEnabled:true,bevelSize:.03,bevelThickness:.04,bevelSegments:2}),paintMat);rr.geometry.translate(0,0,-.7);rr.castShadow=true;roof.add(rr);
+ [-1,1].forEach(s=>{bx(.08,.1,.34,2.5,.74,s*.6,lampF,hood);bx(.08,.12,.34,-2.52,.88,s*.66,lampR,boot)});
+ bx(.06,.14,.7,2.54,.6,0,trim,hood);
+ [[1.64,-1],[1.64,1],[-1.445,-1],[-1.445,1]].forEach(([x,s])=>{const w=new THREE.Group();
+  const t=new THREE.Mesh(new THREE.CylinderGeometry(.333,.333,.24,32),tyre);t.rotation.x=Math.PI/2;t.castShadow=true;w.add(t);
+  const r=new THREE.Mesh(new THREE.CylinderGeometry(.225,.225,.25,24),rim);r.rotation.x=Math.PI/2;w.add(r);
+  const h=new THREE.Mesh(new THREE.CylinderGeometry(.06,.06,.27,12),trim);h.rotation.x=Math.PI/2;w.add(h);
+  w.position.set(x,.333,s*.82);g.add(w)});
+ return g;
+}
+
+function rbox(w,h,d){const r=Math.min(.02,.3*Math.min(w,h,d));
+ const sh=new THREE.Shape(),a=(w-2*r)/2,b=(h-2*r)/2;sh.moveTo(-a,-b);sh.lineTo(a,-b);sh.lineTo(a,b);sh.lineTo(-a,b);sh.closePath();
+ const g=new THREE.ExtrudeGeometry(sh,{depth:Math.max(d-2*r,.001),bevelEnabled:true,bevelSize:r,bevelThickness:r,bevelSegments:3,curveSegments:2});g.translate(0,0,-(d-2*r)/2);return g}
+function lathe(r,h){const c=Math.min(.014,r*.3,h*.3),p=[[0,-h/2],[r-c,-h/2],[r,-h/2+c],[r,h/2-c],[r-c,h/2],[0,h/2]].map(a=>new THREE.Vector2(a[0],a[1]));return new THREE.LatheGeometry(p,32)}
+let steel=null,plateMat=null,boltMat=null;
+function boxDetail(m,[w,hh,d]){ /* recessed lid plate, vent ribs and corner bolts: reads as a housing, not a block */
+ plateMat??=new THREE.MeshStandardMaterial({color:0x151a21,roughness:.55,metalness:.7});boltMat??=new THREE.MeshStandardMaterial({color:0xaab4c0,roughness:.3,metalness:1});
+ const y=hh/2+.002,pw=w*.78,pd=d*.74;
+ const pl=new THREE.Mesh(new THREE.BoxGeometry(pw,.006,pd),plateMat);pl.position.y=y;m.add(pl);
+ const n=Math.max(2,Math.min(6,Math.round(pd/.05)));
+ for(let i=0;i<n;i++){const r=new THREE.Mesh(new THREE.BoxGeometry(pw*.8,.008,.006),boltMat);r.position.set(0,y+.004,-pd*.35+pd*.7*i/(n-1));m.add(r)}
+ const br=Math.min(.012,w*.05);
+ [[-1,-1],[1,-1],[-1,1],[1,1]].forEach(([sx,sz])=>{const b=new THREE.Mesh(new THREE.CylinderGeometry(br,br,.012,6),boltMat);b.position.set(sx*(w/2-.03),y+.004,sz*(d/2-.03));m.add(b)})}
+function flange(grp,s){ /* dark steel collars on larger cylinders so they read as machined parts, not tubes */
+ if(s.c[0]<.04||s.c[1]<.1)return;steel??=new THREE.MeshStandardMaterial({color:0x2a2f37,roughness:.35,metalness:.9});
+ [-1,1].forEach(e=>{const t=new THREE.Mesh(new THREE.TorusGeometry(s.c[0]*1.0,s.c[0]*.14,8,32),steel);t.position.set(...s.at);
+  const ax=new THREE.Vector3(0,e*s.c[1]*.38,0);if(s.c[2]==='x'){t.rotation.y=Math.PI/2;ax.set(e*s.c[1]*.38,0,0)}else if(s.c[2]==='z'){ax.set(0,0,e*s.c[1]*.38)}else t.rotation.x=Math.PI/2;
+  t.position.add(ax);if(s.r)t.position.set(...s.at);t.userData.part=grp.name;if(!s.r)grp.add(t)})}
+
+/* r8 part detail: struts and stereo modules built as real assemblies (damper, spring, boot, brackets; finned housing, terminals, tabs) */
+const STRUTS=new Set(['strutFL','strutFR','strutRL','strutRR']),MODS=new Set(['amp','cdc','bootMods']);
+let M8=null;
+function m8(){return M8??={
+ chrome:new THREE.MeshStandardMaterial({color:0xcfd5dc,roughness:.22,metalness:1}),
+ steel:new THREE.MeshStandardMaterial({color:0x4a515b,roughness:.42,metalness:.95}),
+ dark:new THREE.MeshStandardMaterial({color:0x1d2127,roughness:.5,metalness:.8}),
+ rubber:new THREE.MeshStandardMaterial({color:0x121316,roughness:.92,metalness:0}),
+ brass:new THREE.MeshStandardMaterial({color:0xc9a24a,roughness:.28,metalness:1}),
+ alu:new THREE.MeshStandardMaterial({color:0x8d949d,roughness:.38,metalness:.95}),
+ led:new THREE.MeshStandardMaterial({color:0x2bd67b,emissive:0x2bd67b,emissiveIntensity:1.4,roughness:.4,metalness:0})}}
+function dm(grp,base){const c=base.clone();(grp.userData.extra??=[]).push(c);return c}
+function put(grp,id,geo,mat,x,y,z,rot){const m=new THREE.Mesh(geo,mat);m.position.set(x,y,z);if(rot)m.rotation.set(...rot);m.castShadow=true;m.userData.part=id;(grp.userData.q??=[]).push(m);return m}
+function flush(grp,id){const by=new Map();(grp.userData.q||[]).forEach(m=>{m.updateMatrix();const g=m.geometry.index?m.geometry.toNonIndexed():m.geometry.clone();g.deleteAttribute('uv');g.applyMatrix4(m.matrix);if(!by.has(m.material))by.set(m.material,[]);by.get(m.material).push(g)});
+ by.forEach((gs,mt)=>{const mm=new THREE.Mesh(mergeGeometries(gs,false),mt);mm.castShadow=true;mm.userData.part=id;grp.add(mm)});grp.userData.q=[]}
+function bolt(grp,id,mat,x,y,z,r,axis){const m=put(grp,id,new THREE.CylinderGeometry(r,r,r*.9,6),mat,x,y,z);if(axis==='z')m.rotation.x=Math.PI/2;else if(axis==='x')m.rotation.z=Math.PI/2;return m}
+function buildStrut(grp,id,p,mat){
+ const k=m8(),[x,y,z]=p.s[0].at,h=p.s[0].c[1],yt=y+h/2,yb=y-h/2,top=p.s[1]?p.s[1].at[1]+p.s[1].c[1]/2:yt+.06;
+ const chrome=dm(grp,k.chrome),steel=dm(grp,k.steel),dark=dm(grp,k.dark),rubber=dm(grp,k.rubber),brass=dm(grp,k.brass);
+ /* damper: dark body tube plus polished piston rod */
+ put(grp,id,new THREE.CylinderGeometry(.034,.034,h*.5,24),dark,x,yb+h*.25+.02,z);
+ put(grp,id,new THREE.CylinderGeometry(.038,.038,.012,24),steel,x,yb+h*.5+.02,z);
+ put(grp,id,new THREE.CylinderGeometry(.013,.013,h*.62,16),chrome,x,yb+h*.5+h*.28,z);
+ /* coil spring: helix in the system tint (shares the selection material) */
+ const turns=7,R=.062,pts=[];const y0=yb+.05,y1=top-.06;
+ for(let i=0;i<=turns*20;i++){const a=i/20*Math.PI*2,f=i/(turns*20);pts.push(new THREE.Vector3(x+Math.cos(a)*R,y0+(y1-y0)*f,z+Math.sin(a)*R))}
+ put(grp,id,new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts),turns*20,.0085,8),mat,0,0,0).castShadow=false;
+ /* spring seats */
+ put(grp,id,new THREE.CylinderGeometry(.075,.07,.014,24),steel,x,y0-.005,z);
+ put(grp,id,new THREE.CylinderGeometry(.075,.07,.014,24),steel,x,y1+.005,z);
+ /* ribbed rubber dust boot over the rod */
+ const nb=7;for(let i=0;i<nb;i++){put(grp,id,new THREE.TorusGeometry(.031-.002*(i%2),.008,8,20),rubber,x,top+.012+i*.014,z,[Math.PI/2,0,0])}
+ /* top mount: rubber bush, steel cup, domed nut, bolt ring */
+ put(grp,id,new THREE.CylinderGeometry(.06,.07,.035,24),rubber,x,top+.12,z);
+ put(grp,id,new THREE.CylinderGeometry(.07,.07,.012,24),steel,x,top+.145,z);
+ put(grp,id,new THREE.CylinderGeometry(.018,.018,.022,6),chrome,x,top+.16,z);
+ for(let i=0;i<3;i++){const a=i*2.094+.4;bolt(grp,id,brass,x+Math.cos(a)*.052,top+.155,z+Math.sin(a)*.052,.0095)}
+ /* lower knuckle: forked bracket with eye bush and cross bolt */
+ put(grp,id,new THREE.BoxGeometry(.06,.05,.08),steel,x,yb-.0,z);
+ [-1,1].forEach(s=>put(grp,id,new THREE.BoxGeometry(.05,.075,.014),steel,x,yb-.055,z+s*.036));
+ put(grp,id,new THREE.CylinderGeometry(.022,.022,.1,16),rubber,x,yb-.07,z,[Math.PI/2,0,0]);
+ bolt(grp,id,chrome,x,yb-.07,z+.055,.012,'z');bolt(grp,id,chrome,x,yb-.07,z-.055,.012,'z');
+ flush(grp,id)}
+let M9m=null;
+function M9(){return M9m??={case:new THREE.MeshStandardMaterial({color:0x3a4350,roughness:.34,metalness:.62}),label:new THREE.MeshStandardMaterial({color:0xdde1e6,roughness:.6,metalness:0}),pin:new THREE.MeshStandardMaterial({color:0xd9b25a,roughness:.25,metalness:1}),plug:new THREE.MeshStandardMaterial({color:0x0e1115,roughness:.55,metalness:.2})}}
+function buildModule(grp,id,p,mat){
+ const k=m8(),q=M9(),s=p.s[0],[w,hh,d]=s.b,[x,y,z]=s.at;
+ const body=dm(grp,q.case),alu=dm(grp,k.alu),steel=dm(grp,k.steel),led=dm(grp,k.led),lab=dm(grp,q.label),pin=dm(grp,q.pin),plug=dm(grp,q.plug),rub=dm(grp,k.rubber);
+ const big=id==='amp',ty=y+hh*.46;
+ /* anodised housing, system-colour strap at each end only */
+ put(grp,id,rbox(w*.94,hh*.92,d),body,x,y,z);
+ [-1,1].forEach(e=>put(grp,id,rbox(w*.03,hh*1.02,d*1.06),mat,x+e*w*.485,y,z));
+ /* lid: pressed plate, raised ribs along the length, corner screws */
+ put(grp,id,new THREE.BoxGeometry(w*.82,.006,d*.8),steel,x,ty+.003,z);
+ const nr=Math.max(5,Math.round(w/.028));
+ for(let i=0;i<nr;i++)put(grp,id,new THREE.BoxGeometry(w*.76/nr*.5,.009,d*.6),alu,x-w*.38+w*.76*(i+.5)/nr,ty+.01,z);
+ [[-1,-1],[1,-1],[-1,1],[1,1]].forEach(([a,b2])=>bolt(grp,id,steel,x+a*w*.41,ty+.009,z+b2*d*.4,Math.min(.011,d*.06)));
+ /* heatsink fins on the +z face */
+ const nf=big?13:Math.max(5,Math.round(w/.026)),fw=(w*.84)/nf;
+ for(let i=0;i<nf;i++)put(grp,id,new THREE.BoxGeometry(fw*.52,hh*.82,d*(big?.72:.5)),alu,x-w*.42+fw*(i+.5),y,z+d*.5+d*(big?.34:.22));
+ put(grp,id,new THREE.BoxGeometry(w*.84,hh*.82,d*.14),body,x,y,z+d*.5+.004);
+ /* -z face: label plate, status led, two round locking connectors and a multi-pin plug */
+ const zf=z-d*.5;
+ put(grp,id,new THREE.BoxGeometry(w*.3,hh*.34,.004),lab,x-w*.26,y+hh*.2,zf-.002);
+ put(grp,id,new THREE.SphereGeometry(Math.min(.008,hh*.09),10,8),led,x+w*.38,y+hh*.28,zf-.006);
+ const cr=Math.min(hh*.26,w*.07,.03),nc=big?3:2;
+ for(let i=0;i<nc;i++){const cx=x-w*.3+(w*.55)*(nc>1?i/(nc-1):.5);
+  put(grp,id,new THREE.CylinderGeometry(cr,cr,.024,28),steel,cx,y-hh*.14,zf-.012,[Math.PI/2,0,0]);
+  put(grp,id,new THREE.TorusGeometry(cr*1.05,cr*.16,8,28),alu,cx,y-hh*.14,zf-.026);
+  put(grp,id,new THREE.CylinderGeometry(cr*.72,cr*.72,.014,24),plug,cx,y-hh*.14,zf-.03,[Math.PI/2,0,0]);
+  for(let j=0;j<6;j++){const a=j*Math.PI/3;put(grp,id,new THREE.CylinderGeometry(cr*.07,cr*.07,.014,6),pin,cx+Math.cos(a)*cr*.45,y-hh*.14+Math.sin(a)*cr*.45,zf-.04,[Math.PI/2,0,0])}}
+ const pw=w*.3,px=x+w*.3;
+ put(grp,id,new THREE.BoxGeometry(pw,hh*.3,.022),plug,px,y-hh*.14,zf-.011);
+ put(grp,id,new THREE.BoxGeometry(pw*1.06,hh*.06,.026),steel,px,y-hh*.14+hh*.18,zf-.013);
+ for(let i=0;i<8;i++)put(grp,id,new THREE.BoxGeometry(pw*.07,hh*.13,.012),pin,px-pw*.4+pw*.8*i/7,y-hh*.14,zf-.026);
+ /* mounting feet with bolts */
+ [-1,1].forEach(e=>{put(grp,id,new THREE.BoxGeometry(w*.1,.006,d*1.4+.04),steel,x+e*(w*.5+w*.02),y-hh*.45,z);
+  bolt(grp,id,alu,x+e*(w*.5+w*.02),y-hh*.45+.006,z+(d*.7+.02)*.7,.0085);bolt(grp,id,alu,x+e*(w*.5+w*.02),y-hh*.45+.006,z-(d*.7+.02)*.7,.0085)});
+ /* cable gland and lead from the +x end */
+ put(grp,id,new THREE.CylinderGeometry(.011,.011,.03,12),steel,x+w*.5+.02,y+hh*.18,z,[0,0,Math.PI/2]);
+ put(grp,id,new THREE.TubeGeometry(new THREE.CatmullRomCurve3([new THREE.Vector3(x+w*.5+.035,y+hh*.18,z),new THREE.Vector3(x+w*.5+.09,y+hh*.12,z+.02),new THREE.Vector3(x+w*.5+.12,y-hh*.2,z+.04)]),12,.0055,6),rub,0,0,0);
+ flush(grp,id)}
+function buildInternals(){
+ const mats={};
+ const mk=gp=>new THREE.MeshStandardMaterial({color:gp==='none'?new THREE.Color(0x7b8794):new THREE.Color(GC[gp]).multiplyScalar(.62),roughness:.34,metalness:.55,emissive:gp==='none'?new THREE.Color(0x000000):new THREE.Color(GC[gp]).multiplyScalar(.1)});
+ Object.keys(PARTS).forEach(id=>{const p=PARTS[id];const grp=new THREE.Group();grp.name=id;grp.userData.part=id;
+  const mat=mk(groupOf(id));mat.userData.e=mat.emissive.clone();grp.userData.mat=mat;
+  if(p.fibre){const c=new THREE.CatmullRomCurve3([[.98,1.06,.05],[.8,.6,.12],[.2,.45,.14],[-1.2,.45,.14],[-1.9,.7,.1],[-2.1,.88,-.3],[-1.9,.62,-.3],[-1.2,.43,-.14],[.2,.43,-.12],[.8,.58,-.05]].map(a=>new THREE.Vector3(...a)));
+   const m=new THREE.Mesh(new THREE.TubeGeometry(c,80,.012,6),mat);m.userData.part=id;grp.add(m)}
+  if(STRUTS.has(id)&&p.s&&p.s[0]&&p.s[0].c){buildStrut(grp,id,p,mat);internals.add(grp);return}
+  if(MODS.has(id)&&p.s&&p.s[0]&&p.s[0].b){buildModule(grp,id,p,mat);internals.add(grp);return}
+  (p.s||[]).forEach(s=>{let geo;
+   if(s.b)geo=rbox(...s.b);
+   else if(s.c){geo=lathe(s.c[0],s.c[1]);flange(grp,s);if(s.c[2]==='x')geo.rotateZ(Math.PI/2);else if(s.c[2]==='z')geo.rotateX(Math.PI/2)}
+   else if(s.tube){const cu=new THREE.CatmullRomCurve3([new THREE.Vector3(...s.tube[0]),new THREE.Vector3(...s.tube[1])]);const m=new THREE.Mesh(new THREE.TubeGeometry(cu,2,s.tube[2],6),mat);m.userData.part=id;grp.add(m);return}
+   const m=new THREE.Mesh(geo,mat);m.position.set(...s.at);if(s.r)m.rotation.set(...s.r);m.userData.part=id;grp.add(m);
+   if(s.b&&Math.min(s.b[0],s.b[2])>.1)boxDetail(m,s.b)});
+  internals.add(grp)});
+ const spine=new THREE.Mesh(new THREE.BoxGeometry(4.9,.05,.9),new THREE.MeshStandardMaterial({color:0x1a1e24,roughness:.8,metalness:.5}));spine.position.set(-.1,.24,0);internals.add(spine);
+ const tx={};const mkTex=(col)=>{const c=document.createElement('canvas');c.width=c.height=96;const g=c.getContext('2d');g.fillStyle='rgba(10,12,16,.82)';g.beginPath();g.arc(48,48,34,0,7);g.fill();g.lineWidth=7;g.strokeStyle=col;g.beginPath();g.arc(48,48,34,0,7);g.stroke();g.fillStyle=col;g.beginPath();g.arc(48,48,11,0,7);g.fill();const t=new THREE.CanvasTexture(c);t.colorSpace=THREE.SRGBColorSpace;return t};
+ Object.keys(PARTS).forEach(id=>{const gp=groupOf(id);tx[gp]??=mkTex(GC[gp]);
+  const sp=new THREE.Sprite(new THREE.SpriteMaterial({map:tx[gp],depthTest:false,transparent:true,sizeAttenuation:false,toneMapped:false}));sp.scale.setScalar(.042);sp.position.copy(CEN[id]);sp.renderOrder=20;sp.userData.part=id;sp.visible=false;car.add(sp);pins[id]=sp;pinList.push(sp)});
+}
+
+async function tryModel(){
+ let url=null;
+ for(const u of ['model/scene.gltf','model/scene.glb']){try{const r=await fetch(u,{method:'HEAD'});if(r.ok){url=u;break}}catch(e){}}
+ if(!url)return false;
+ const gl=new GLTFLoader();const dr=new DRACOLoader();dr.setDecoderPath('https://www.gstatic.com/draco/versioned/decoders/1.5.7/');gl.setDRACOLoader(dr);
+ const g=await new Promise((res,rej)=>gl.load(url,res,e=>{if(e.total)$('#load').style.width=(100*e.loaded/e.total)+'%'},rej));
+ const root=g.scene;const b=new THREE.Box3().setFromObject(root);const sz=b.getSize(new THREE.Vector3());
+ const holder=new THREE.Group();holder.add(root);
+ if(sz.z>sz.x)holder.rotation.y=Math.PI/2;
+ if(P.get('rot'))holder.rotation.y+=THREE.MathUtils.degToRad(+P.get('rot'));
+ holder.updateMatrixWorld(true);let b2=new THREE.Box3().setFromObject(holder);const s2=b2.getSize(new THREE.Vector3());const k=5.12/Math.max(s2.x,s2.z);holder.scale.setScalar(k);holder.updateMatrixWorld(true);b2=new THREE.Box3().setFromObject(holder);const c=b2.getCenter(new THREE.Vector3());holder.position.set(-c.x,-b2.min.y-.07,-c.z);
+ holder.updateMatrixWorld(true);
+ const lift=[[/bumper_F|bumperbar_F|grille/i,[.7,.16,0]],[/bumper_R/i,[-.7,.16,0]],[/hood|bonnet|capot/i,[.35,.95,0]],[/trunk|boot|tailgate|deck/i,[-.35,.85,0]],[/roof|sunroof/i,[0,1.2,0]],[/door|portiere|puerta/i,null]];
+ shellMats=[];paintMats.length=0;
+ root.traverse(o=>{if(!o.isMesh)return;o.castShadow=true;
+  {const sw=m=>{const n=(m&&m.name)||'';if(/^paint$|carpaint|lak/i.test(n))return paintMat;if(/window_glass/i.test(n))return glassMat;return m};
+   o.material=Array.isArray(o.material)?o.material.map(sw):sw(o.material)}
+  (Array.isArray(o.material)?o.material:[o.material]).forEach(m=>{if(m===paintMat){if(!m.userData._reg){m.userData._reg=1;shellMats.push({m,base:1})}return}if(m===glassMat){if(!m.userData._reg){m.userData._reg=1;shellMats.push({m,base:1})}return}if(!m||m.userData._reg)return;m.userData._reg=1;
+   if(/paint|body|carpaint|exterior|lak/i.test(m.name||'')&&m.color){m.color.setHex(PAINTS[S.paint][1]);m.metalness=PAINTS[S.paint][2];m.roughness=PAINTS[S.paint][3];m.envMapIntensity=.7;if('clearcoat' in m){m.clearcoat=1;m.clearcoatRoughness=.04}paintMats.push(m)}
+   shellMats.push({m,base:m.opacity??1})})});
+ segs=[];const hit=new Set();
+ root.traverse(o=>{if(hit.has(o)||o===root)return;const n=o.name||'';for(const[re,off] of lift){if(re.test(n)){let v=off;if(!v){const cc=new THREE.Box3().setFromObject(o).getCenter(new THREE.Vector3());v=[0,.15,Math.sign(cc.z||1)*1.15]}
+   o.parent.updateWorldMatrix(true,false);const inv=o.parent.matrixWorld.clone().invert();const w=new THREE.Vector3(...v);segs.push({grp:o,off:w.applyMatrix4(inv).sub(new THREE.Vector3().applyMatrix4(inv))});o.traverse(q=>hit.add(q));break}}});
+ /* wheels: the four wheel nodes ship stacked at the origin, rim only, hub cap on -z. Place them on the axles and add a tyre. */
+ const tyres=[];const tyreMat=new THREE.MeshStandardMaterial({color:0x0d0d0f,roughness:.88,metalness:0});shellMats.push({m:tyreMat,base:1});
+ const WP=[['w220_wheel',1.64,-1],['w220_wheel_2',1.64,1],['w220_wheel_3',-1.445,-1],['s500_wheel',-1.445,1]];
+ WP.forEach(([nm,wx,sz])=>{const w=root.getObjectByName(nm);if(!w)return;
+  if(sz>0)w.rotateOnWorldAxis(new THREE.Vector3(0,1,0),Math.PI);
+  w.updateWorldMatrix(true,true);const bb=new THREE.Box3().setFromObject(w);const c=bb.getCenter(new THREE.Vector3());
+  const tgt=new THREE.Vector3(wx,.345,sz*.84);const inv=w.parent.matrixWorld.clone().invert();
+  const d=tgt.clone().applyMatrix4(inv).sub(c.clone().applyMatrix4(inv));w.position.add(d);
+  const ty=new THREE.Mesh(new THREE.CylinderGeometry(.345,.345,.22,40),tyreMat);ty.rotation.x=Math.PI/2;ty.castShadow=true;ty.position.set(wx,.345,sz*.82);tyres.push(ty)});
+ shell.clear();shell.add(holder);tyres.forEach(t=>shell.add(t));
+ CY=.82;
+ {const v12=root.getObjectByName('w220_engine_v12');if(v12)v12.visible=false}
+ S.modelLoaded=true;return true;
+}
+
+function applyShell(){
+ const op=1-(S.sel?.96:.92)*S.p;
+ shellMats.forEach(o=>{const m=o.m;const t=S.p>.001;if(m.transparent!==t){m.transparent=t;m.needsUpdate=true}m.opacity=o.base*op;m.depthWrite=S.p<.35});
+ segs.forEach(s=>{if(!s.home)s.home=s.grp.position.clone();s.grp.position.copy(s.home).addScaledVector(s.off,ease(S.e))});
+ internals.visible=S.p>.02;
+ const pinsOn=S.p>.3;
+ pinList.forEach(sp=>{const id=sp.userData.part;const gp=groupOf(id);let v=pinsOn&&gp!=='none';
+  if(S.sys)v=pinsOn&&gp===S.sys;if(S.hits)v=pinsOn&&S.hits.includes(id);if(S.sel===id&&S.p>.05)v=true;
+  sp.userData.want=v;sp.visible=v;sp.scale.setScalar(S.sel===id?.06:.036)});declutter(true)
+ Object.keys(PARTS).forEach(id=>{const g=internals.getObjectByName(id);if(!g)return;const sel=S.sel===id;const dim=(S.sys&&groupOf(id)!==S.sys)||(S.hits&&!S.hits.includes(id));
+  const mat=g.userData.mat;mat.emissive.copy(sel?new THREE.Color(0xffb547):mat.userData.e);mat.emissiveIntensity=sel?.55:1;const t=!!dim;if(mat.transparent!==t){mat.transparent=t;mat.needsUpdate=true}mat.opacity=dim?.22:1;(g.userData.extra||[]).forEach(em=>{if(em.transparent!==t){em.transparent=t;em.needsUpdate=true}em.opacity=dim?.22:1})});
+ dirty=true;
+}
+function setView(v){
+ S.view=v;const p1=v==='solid'?0:(v==='peel'?1:.6),e1=v==='explode'?1:0;
+ $('#vSolid').setAttribute('aria-pressed',v==='solid');$('#vPeel').setAttribute('aria-pressed',v==='peel');$('#vExp').setAttribute('aria-pressed',v==='explode');
+ const p0=S.p,e0=S.e;tween(700,t=>{S.p=p0+(p1-p0)*ease(t);S.e=e0+(e1-e0)*t;applyShell()});
+ if(v==='explode'&&camera&&!S.sel){const h=homeCam();const t=h.tgt.clone().add(new THREE.Vector3(0,.25,0));flyCam(t.clone().addScaledVector(h.pos.clone().sub(h.tgt),1.42),t)}
+}
+function layoutOffsets(){
+ const open=$('#panel').classList.contains('open'),W=innerWidth,H=innerHeight;let fl=0,fr=W,ft=0,fb=H;
+ const tb=$('#top').getBoundingClientRect().bottom+8;ft=tb;
+ if(open&&mobile()){const h=Math.round(H*.56);document.documentElement.style.setProperty('--sheet',h+'px');fb=H-h}
+ else{document.documentElement.style.setProperty('--sheet','0px');const br=$('#bar').getBoundingClientRect();fb=Math.min(H,br.top>H*.5?br.top-8:H)}
+ if(open&&!mobile())fr=W-(392+16+16);
+ const cx=(fl+fr)/2,cy=(ft+fb)/2;S.offXT=W/2-cx+(!open&&W>=900?64:0);S.offYT=H/2-cy;S.free={fw:Math.max(.2,(fr-fl)/W),fh:Math.max(.2,(fb-ft)/H)};
+ document.body.classList.toggle('pOpen',open);dirty=true;
+}
+function resize(){
+ if(!renderer)return;const w=innerWidth,h=innerHeight;renderer.setSize(w,h);camera.aspect=w/h;camera.updateProjectionMatrix();
+ if(camera.view&&camera.view.enabled)camera.setViewOffset(w,h,S.offX,S.offY,w,h);layoutOffsets();dirty=true;
+}
+let CY=.62;const FIT=+(P.get('fit')||1.78);
+const PORT_PV=(P.get('pv')||'.5,.62,.2').split(',').map(Number),PORT_V=+(P.get('pvv')||2.8),PORT_H=+(P.get('ph')||1.87);
+const PORT_D=(vf,hf)=>Math.max(PORT_V/Math.tan(vf/2),PORT_H/Math.tan(hf/2));
+function homeCam(){
+ const asp=camera.aspect,vf=THREE.MathUtils.degToRad(camera.fov),hf=2*Math.atan(Math.tan(vf/2)*asp);
+ const por=asp<.8;const d=por?Math.min(PORT_D(vf,hf),30):Math.min(FIT/Math.sin(Math.min(vf/2,hf/2)),30);const pv=por?new THREE.Vector3(PORT_PV[0],PORT_PV[1],PORT_PV[2]):new THREE.Vector3(.78,.3,.7);
+ return {pos:pv.normalize().multiplyScalar(d).add(new THREE.Vector3(0,CY,0)),tgt:new THREE.Vector3(0,CY,0)};
+}
+function flyCam(pos,tgt,dist){
+ const p0=camera.position.clone(),t0=controls.target.clone();
+ let p1=pos,t1=tgt;
+ if(!pos){const dir=p0.clone().sub(t0).normalize();t1=t0.clone();p1=t0.clone().addScaledVector(dir,dist)}
+ tween(950,t=>{const k=ease(t);camera.position.lerpVectors(p0,p1,k);controls.target.lerpVectors(t0,t1,k);controls.update()});
+}
+function flyToBox(box,pad=1){
+ const c=box.getCenter(new THREE.Vector3()),sz=box.getSize(new THREE.Vector3());const r=Math.max(sz.x,sz.y,sz.z,.12)*pad;
+ const sx=Math.abs(c.x)>.3?Math.sign(c.x):.5,sz2=c.z>=0?1:-1;
+ const dir=new THREE.Vector3(sx*.7,CY,sz2*.78).normalize();
+ const F=S.free||{fw:1,fh:1},vh=2*Math.tan(THREE.MathUtils.degToRad(camera.fov)/2),vw=vh*camera.aspect,want=.4;
+ /* distance at which the part box covers about 40% of the free area, never closer than 2.6 m (closer = grey murk) */
+ const dist=THREE.MathUtils.clamp(Math.max(r/(want*vh*F.fh),r/(want*vw*F.fw)),2.6,7.5);
+ flyCam(c.clone().addScaledVector(dir,dist),c,dist);
+}
+function nearestParts(id,n=4){const c=CEN[id];return Object.keys(PARTS).filter(k=>k!==id).sort((a,b)=>CEN[a].distanceTo(c)-CEN[b].distanceTo(c)).slice(0,n)}
+const APPROX=/UNVERIFIED|approximate|believed|not confirmed|likely|exact (spot|position)/i;
+const clean=s=>String(s??'').replace(/UNVERIFIED/g,'not confirmed');
+function cardHTML(c,open){
+ const li=a=>(a||[]).map(x=>`<li>${esc(clean(x))}</li>`).join('');
+ return `<details class="g-${c.g}" ${open?'open':''}><summary>${esc(c.title)}</summary><div class="cb">
+ ${c.where?`<h4>Where it is</h4><p>${esc(clean(c.where))}</p>`:''}
+ ${c.quote?`<p class="q">${esc(c.quote)}</p>`:''}
+ ${c.verdict?`<h4>Verdict</h4><p class="v">${esc(clean(c.verdict))}</p>`:''}
+ ${c.check?.length?`<h4>Check first</h4><ul>${li(c.check)}</ul>`:''}
+ ${c.fixSteps?.length?`<h4>Fix steps</h4><ol>${li(c.fixSteps)}</ol>`:''}
+ ${c.fx?.length?`<h4>Fixings and connectors</h4><ul class="fxs">${c.fx.map(f=>`<li>${esc(clean(f.t))}${f.b?`<small>Source: ${esc(f.b)}</small>`:''}</li>`).join('')}</ul>`:''}
+ ${c.partsList?`<div class="meta">Parts: ${esc(c.partsList)}</div>`:''}
+ ${(c.cost||c.diff)?`<div class="meta">${esc([c.cost,c.diff&&('Difficulty: '+c.diff)].filter(Boolean).join('  |  '))}</div>`:''}
+ ${c.safety?'<span class="safe">Safety critical: do not skip the checks</span>':''}
+ </div></details>`;
+}
+function openPanel(id,cardId){
+ const p=PARTS[id],cards=cardsByPart[id]||[];const gs=[...new Set(cards.map(c=>c.g))];
+ $('#pgrow').innerHTML=`<div class="sys">${gs.length?gs.map(g=>`<span class="tag g-${g}"><i class="dot g-${g}"></i>${GN[g]}</span>`).join(''):'<span class="tag">No fault notes</span>'}</div><h2>${esc(p.name)}</h2>`;
+ const near=nearestParts(id);
+ $('#pbody').innerHTML=`${APPROX.test(p.d)?'<div class="flag">Position approximate until mapped on the real model</div>':''}<p>${esc(clean(p.d))}</p>
+ <h3>Fault notes <span class="num">${cards.length}</span></h3>
+ ${cards.length?cards.map((c,i)=>cardHTML(c,cardId?c.id===cardId:i===0)).join(''):'<p>The guide has no fault note for this part. It is shown so you can find what sits around the faulty one.</p>'}
+`;
+ $('#pfoot').innerHTML=`<h3>Next to it</h3><div class="nb">${near.map(k=>`<button data-sel="${k}">${esc(PARTS[k].name.replace(/\s*\(.*\)/,''))}</button>`).join('')}</div>`;
+ $('#panel').classList.add('open');$('#pbody').scrollTop=0;layoutOffsets();$('#hint').classList.add('off');
+}
+function select(id,opts={}){
+ if(!PARTS[id])return;S.sel=id;S.hits=opts.hits||null;
+ if(S.view==='solid')setView('peel');
+ openPanel(id,opts.card);applyShell();
+ if(renderer&&opts.fly!==false){if(S.hits&&S.hits.length>1){const bx=new THREE.Box3();S.hits.forEach(k=>bx.union(BOX[k]));flyToBox(bx,1.05)}else flyToBox(BOX[id])}
+}
+function clearSel(){S.sel=null;S.hits=null;$('#panel').classList.remove('open');layoutOffsets();applyShell()}
+$('#pclose').onclick=clearSel;
+$('#panel').addEventListener('click',e=>{const b=e.target.closest('[data-sel]');if(b)select(b.dataset.sel)});
+
+function searchIndex(q){
+ const t=q.toLowerCase().trim();if(!t)return[];
+ const toks=t.split(/\s+/);const out=[];const ids=new Set();
+ Object.keys(ALIAS).forEach(k=>{if(t===k||t.includes(k)||(k.includes(t)&&t.length>2)){ALIAS[k].forEach(id=>{if(!ids.has(id)){ids.add(id);out.push({type:'part',id,score:t===k?100:60})}})}});
+ Object.keys(PARTS).forEach(id=>{if(ids.has(id))return;const p=PARTS[id];const nm=p.name.toLowerCase();const txt=(nm+' '+p.d.toLowerCase()+' '+(cardsByPart[id]||[]).map(c=>c.title.toLowerCase()).join(' '));
+  if(toks.every(x=>txt.includes(x))){ids.add(id);out.push({type:'part',id,score:toks.every(x=>nm.includes(x))?80:30})}});
+ CARDS.forEach(c=>{const txt=(c.title+' '+(c.where||'')).toLowerCase();if(toks.every(x=>txt.includes(x))&&c.parts?.length)out.push({type:'card',id:c.parts[0],card:c.id,title:c.title,g:c.g,score:toks.every(x=>c.title.toLowerCase().includes(x))?70:20})});
+ return out.sort((a,b)=>b.score-a.score).slice(0,7);
+}
+let results=[],ri=-1;
+function showRes(){
+ const q=$('#q').value;const r=$('#res');results=searchIndex(q);ri=results.length?0:-1;
+ if(!q.trim()){r.classList.remove('on');$('#q').setAttribute('aria-expanded','false');return}
+ r.innerHTML=results.length?results.map((x,i)=>{const g=x.type==='card'?x.g:groupOf(x.id);return `<button role="option" aria-selected="${i===ri}" data-i="${i}"><i class="dot g-${g}"></i><b>${esc(x.type==='card'?x.title:PARTS[x.id].name)}</b><i>${x.type==='card'?'fault note':'part'}</i></button>`}).join(''):`<div class="none">No part matches "${esc(q)}". Try fuse, strut, stereo, idle or fan.</div>`;
+ r.classList.add('on');$('#q').setAttribute('aria-expanded','true');
+}
+function pick(i){const x=results[i];if(!x)return;
+ const strong=results.filter(y=>y.type==='part'&&y.score>=60).map(y=>y.id);
+ const hits=x.type==='part'&&strong.length>1&&strong.includes(x.id)?strong:null;
+ $('#res').classList.remove('on');$('#q').setAttribute('aria-expanded','false');$('#q').blur();
+ select(x.id,{card:x.card,hits});}
+$('#q').addEventListener('input',showRes);$('#q').addEventListener('focus',showRes);
+$('#q').addEventListener('keydown',e=>{if(e.key==='Enter'){if(ri<0)ri=0;pick(ri)}else if(e.key==='ArrowDown'||e.key==='ArrowUp'){e.preventDefault();ri=Math.max(0,Math.min(results.length-1,ri+(e.key==='ArrowDown'?1:-1)));[...$('#res').children].forEach((b,i)=>b.setAttribute('aria-selected',i===ri))}else if(e.key==='Escape'){$('#q').value='';showRes();$('#q').blur()}});
+$('#res').addEventListener('click',e=>{const b=e.target.closest('[data-i]');if(b)pick(+b.dataset.i)});
+document.addEventListener('pointerdown',e=>{if(!e.target.closest('.sbox'))$('#res').classList.remove('on')});
+
+function buildChrome(){
+ const chips=$('#chips');chips.innerHTML=['all','stereo','air','fix','scan'].map(g=>`<button class="chip ${g==='all'?'':'g-'+g}" data-g="${g}" aria-pressed="${g==='all'}">${g==='all'?'All systems':`<i class="dot g-${g}"></i>${GN[g]}`}</button>`).join('');
+ document.querySelector('.sbox').addEventListener('click',e=>{if(e.target.classList.contains('sbox'))document.querySelector('#q').focus()});
+ chips.onclick=e=>{const b=e.target.closest('.chip');if(!b)return;const g=b.dataset.g==='all'?null:b.dataset.g;S.sys=g;S.hits=null;
+  chips.querySelectorAll('.chip').forEach(c=>c.setAttribute('aria-pressed',(c.dataset.g==='all'&&!g)||c.dataset.g===g));
+  if(g){if(S.view==='solid')setView('peel');const bx=new THREE.Box3();Object.keys(PARTS).filter(id=>groupOf(id)===g).forEach(id=>bx.union(BOX[id]));if(renderer)flyToBox(bx,1.15)}
+  else if(S.view==='peel'&&!S.sel)setView('solid');applyShell();$('#hint').classList.add('off')};
+ $('#vSolid').onclick=()=>{S.sel=null;S.hits=null;$('#panel').classList.remove('open');layoutOffsets();setView('solid');applyShell()};
+ $('#vPeel').onclick=()=>setView('peel');$('#vExp').onclick=()=>setView('explode');
+ $('#bReset').onclick=()=>{if(!camera)return;const h=homeCam();flyCam(h.pos,h.tgt)};
+ $('#paint').innerHTML=PAINTS.map((p,i)=>`<button class="sw" aria-label="${p[0]}" title="${p[0]}" aria-pressed="${i===0}" style="background:#${p[1].toString(16).padStart(6,'0')}"></button>`).join('');
+ $('#paint').onclick=e=>{const b=e.target.closest('.sw');if(b)setPaint([...$('#paint').children].indexOf(b))};
+ addEventListener('keydown',e=>noteAct());addEventListener('pointerdown',()=>noteAct(),true);
+ addEventListener('keydown',e=>{if(e.target.matches('input'))return;if(e.key==='Escape')clearSel();if(e.key==='/'){e.preventDefault();$('#q').focus()}});
+}
+
+const CLR=56;let clBtns=[],clSig='';
+function declutter(force){
+ if(!camera||!pinList.length)return;
+ const want=pinList.filter(sp=>sp.userData.want);
+ const ch=$('#chips').getBoundingClientRect(),TS=ch.height?ch.bottom+26:0;
+ const pts=[];want.forEach(sp=>{const q=pinScreen(sp);if(!q)return;const edge=q.y<TS&&S.sel!==sp.userData.part;if(edge)q.y=TS;pts.push({sp,q,id:sp.userData.part,edge})});
+ pts.sort((a,b)=>(S.sel===b.id)-(S.sel===a.id));
+ const used=new Set(),cls=[];
+ pts.forEach(a=>{if(used.has(a))return;used.add(a);const m=[a];
+  if(S.sel!==a.id)pts.forEach(b=>{if(used.has(b)||S.sel===b.id)return;if(Math.hypot(a.q.x-b.q.x,a.q.y-b.q.y)<CLR){used.add(b);m.push(b)}});
+  cls.push(m)});
+ const sig=cls.map(m=>m.length+(m[0].edge?'e':'')+':'+Math.round(m[0].q.x)+','+Math.round(m[0].q.y)).join('|')+S.sys+S.sel;
+ if(sig===clSig&&!force)return;clSig=sig;
+ const host=$('#cl');let k=0;
+ pinList.forEach(sp=>{sp.visible=!!sp.userData.want});
+ cls.forEach(m=>{
+  if(m.length===1&&!m[0].edge)return;
+  m.forEach(p=>p.sp.visible=false);
+  let cx=0,cy=0;m.forEach(p=>{cx+=p.q.x;cy+=p.q.y});cx/=m.length;cy/=m.length;
+  const cnt={};m.forEach(p=>{const g=groupOf(p.id);cnt[g]=(cnt[g]||0)+1});
+  const dom=Object.keys(cnt).sort((a,b)=>cnt[b]-cnt[a])[0];
+  let b=clBtns[k];if(!b){b=document.createElement('button');b.className='clb num';host.appendChild(b);clBtns[k]=b}
+  k++;b.style.display='';b.style.setProperty('--k',m.length>1?(1+Math.min(.34,(m.length-1)*.07)).toFixed(2):'1');b.style.setProperty('--c',GC[dom]||'#ffb547');b.style.transform=`translate(${cx}px,${cy}px)`;b.textContent=m.length;
+  b.setAttribute('aria-label',m.length===1?PARTS[m[0].id].name+'. Tap to open.':m.length+' parts here. Tap to zoom in.');b._m=m.map(p=>p.id)});
+ for(let i=k;i<clBtns.length;i++){clBtns[i].style.display='none';clBtns[i]._m=null}
+ dirty=true;
+}
+function clusterTap(b){noteAct();
+ const ids=b._m;if(!ids)return;
+ if(ids.length===1){select(ids[0]);return}
+ const c=new THREE.Vector3();ids.forEach(id=>c.add(CEN[id]));c.divideScalar(ids.length);car.localToWorld(c);
+ const L=$('#clist');L.innerHTML=ids.map(id=>`<button data-id="${id}"><span class="dot g-${groupOf(id)}"></span><b>${PARTS[id].name}</b></button>`).join('');
+ const r=b.getBoundingClientRect();L.classList.add('on');
+ const lh=L.offsetHeight;L.style.left=Math.max(10,Math.min(innerWidth-270,r.left-120))+'px';L.style.top=Math.max(10,Math.min(innerHeight-lh-10,r.bottom+8))+'px';
+}
+function pinScreen(sp){
+ const v=sp.position.clone();car.localToWorld(v);v.project(camera);if(v.z>1)return null;
+ return {x:(v.x*.5+.5)*innerWidth,y:(-v.y*.5+.5)*innerHeight};
+}
+function setupPick(){
+ $('#cl').addEventListener('click',e=>{const b=e.target.closest('.clb');if(b)clusterTap(b)});
+ $('#clist').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;$('#clist').classList.remove('on');select(b.dataset.id)});
+ addEventListener('pointerdown',e=>{if(!e.target.closest('#clist,.clb'))$('#clist').classList.remove('on')},true);
+ const el=renderer.domElement;let d0=null;const ray=new THREE.Raycaster();const pt=new THREE.Vector2();
+ el.addEventListener('pointerdown',e=>{d0={x:e.clientX,y:e.clientY,t:performance.now()}});
+ el.addEventListener('pointerup',e=>{if(!d0)return;const mv=Math.hypot(e.clientX-d0.x,e.clientY-d0.y),dt=performance.now()-d0.t;d0=null;if(mv>8||dt>500)return;pickAt(e.clientX,e.clientY)});
+ function pickAt(x,y){
+  let best=null,bd=26;
+  pinList.forEach(sp=>{if(!sp.visible)return;const q=pinScreen(sp);if(!q)return;const dd=Math.hypot(q.x-x,q.y-y);if(dd<bd){bd=dd;best=sp.userData.part}});
+  if(best){select(best);return}
+  pt.set(x/innerWidth*2-1,-(y/innerHeight)*2+1);ray.setFromCamera(pt,camera);
+  const hits=ray.intersectObjects(internals.visible?[internals,shell]:[shell],true);
+  for(const hh of hits){let o=hh.object;while(o&&!o.userData.part)o=o.parent;if(o){select(o.userData.part);return}
+   const lp=car.worldToLocal(hh.point.clone());let bi=null,bdist=1e9;
+   Object.keys(PARTS).forEach(id=>{const dd=CEN[id].distanceTo(lp);if(dd<bdist){bdist=dd;bi=id}});
+   if(bi&&bdist<1.0){select(bi);return}break}
+ }
+}
+
+function frame(now){
+ requestAnimationFrame(frame);
+ const dt=lastT?Math.min(100,now-lastT):0;lastT=now;
+ const idleOK=!RM&&S.ready&&S.view==='solid'&&!S.sel&&!S.sys&&!tweens.length&&!document.hidden&&!$('#clist').classList.contains('on')&&now-lastAct>5000&&turnMs<40000;
+ if(idleOK)turnMs+=dt;controls.autoRotate=idleOK;
+ for(let i=tweens.length-1;i>=0;i--){const t=tweens[i];const k=Math.min(1,(now-t.t0)/t.dur);t.fn(k);dirty=true;if(k>=1){tweens.splice(i,1);t.done&&t.done()}}
+ if(S.offX!==S.offXT||S.offY!==S.offYT||!camera.view?.enabled){const k=RM?1:.18;S.offX+=(S.offXT-S.offX)*k;S.offY+=(S.offYT-S.offY)*k;if(Math.abs(S.offXT-S.offX)<.4)S.offX=S.offXT;if(Math.abs(S.offYT-S.offY)<.4)S.offY=S.offYT;
+  camera.setViewOffset(innerWidth,innerHeight,S.offX,S.offY,innerWidth,innerHeight);dirty=true}
+ if(controls.update())dirty=true;
+ if(dirty){dirty=false;renderer.render(scene,camera);declutter(false)}
+}
+function setNote(){
+ const n=$('#note');
+ if(S.modelLoaded){n.className='';n.innerHTML='<span class="r1">Model: <a href="https://sketchfab.com/3d-models/mercedes-benz-s600-w220-2005-us-spec-b347ac28947f4d2db9da222772401fdd" target="_blank" rel="noopener">Mercedes-Benz S600 W220 2005 (US-Spec)</a></span><span class="r2">by <a href="https://sketchfab.com/szymonpasterczyk" target="_blank" rel="noopener">Merc_TV</a>, <a href="http://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">CC BY 4.0</a>.</span>'}
+ else{n.className='ph';n.textContent='PLACEHOLDER BODY. The real W220 model is not loaded yet. Part positions are approximate.'}
+}
+async function boot(){
+ buildChrome();
+ const ok=initGL();
+ window.MERC={select,search:searchIndex,ready:true,gl:false};
+ if(!ok){$('#hint').classList.add('off');return}
+ shell.add(buildPlaceholder());buildInternals();
+ setupPick();resize();addEventListener('resize',resize);
+ const h=homeCam();camera.position.copy(h.pos);controls.target.copy(h.tgt);controls.update();
+ requestAnimationFrame(frame);applyShell();setNote();
+ try{if(await tryModel()){setNote();const h2=homeCam();camera.position.copy(h2.pos);controls.target.copy(h2.tgt);controls.update();applyShell()}}
+ catch(e){console.warn('model load failed, placeholder kept',e);$('#note').textContent='PLACEHOLDER BODY. The model file could not be loaded.'}
+ $('#load').style.width='100%';setTimeout(()=>$('#load').style.opacity=0,300);
+ dirty=true;S.ready=true;
+ window.MERC={select,setView,search:searchIndex,state:()=>({sel:S.sel,view:S.view,p:S.p,e:S.e,sys:S.sys,model:S.modelLoaded,calls:renderer.info.render.calls,pinsVisible:pinList.filter(p=>p.visible).length,cam:camera.position.toArray(),tgt:controls.target.toArray()}),ready:true,gl:true,idle:()=>tweens.length===0,motion:()=>({rm:RM,auto:controls.autoRotate,az:controls.getAzimuthalAngle(),tweens:tweens.length}),setRM:v=>{RM=!!v},cover:()=>{const b=new THREE.Box3().setFromObject(shell),pts=[];for(const x of [b.min.x,b.max.x])for(const y of [b.min.y,b.max.y])for(const z of [b.min.z,b.max.z])pts.push(new THREE.Vector3(x,y,z).project(camera));const px=pts.map(p=>(p.x*.5+.5)*innerWidth),py=pts.map(p=>(-p.y*.5+.5)*innerHeight);return {x0:Math.min(...px),x1:Math.max(...px),y0:Math.min(...py),y1:Math.max(...py),W:innerWidth,H:innerHeight,free:S.free,off:[S.offX,S.offY]}},clusterCount:()=>clBtns.filter(b=>b._m).length,pinScreen:id=>pinScreen(pins[id])};
+}
+boot();
+</script>
+</body>
+</html>
