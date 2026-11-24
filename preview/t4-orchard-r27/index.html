@@ -3114,7 +3114,7 @@ html body #p-calendar .cal-it.on{transform:none}
 <p class="hx-x">When does your current fixed term end? General information, not advice. Sample figures.</p>
 <span class="hx-cta">Book a 15 minute call</span>
 <div class="hx-ok"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8.5l3.2 3.2L13 4.8"/></svg><span class="hx-ok-l">Compliance line checked</span><span class="hx-ok-s">Compliance checked</span></div></div>
-<div class="hx-l hx-meter" style="--z:140px"><span class="hx-k">Opened, the real record</span><b class="hx-big"><span data-hx-rate>20.5</span><small>%</small></b><i class="hx-trk"><i class="hx-fill"></i></i><span class="hx-s"><span data-hx-sent>31</span> newsletters sent, New Image, Moosend</span></div>
+<div class="hx-l hx-meter" style="--z:140px"><span class="hx-k">Opened, real record</span><b class="hx-big"><span data-hx-rate>20.5</span><small>%</small></b><i class="hx-trk"><i class="hx-fill"></i></i><span class="hx-s"><span data-hx-sent>31</span> newsletters sent, New Image, Moosend</span></div>
 <div class="hx-l hx-chip" style="--z:210px"><span data-hx-sent2>31</span> sent</div>
 </div></div></div>
 <a class="hx-go" href="#p-edm" aria-label="Go to the eDM set-piece, inbox to compliance line"></a></div>
@@ -4329,6 +4329,10 @@ html body .dock #pause.pause::before{inset:-3px!important}
 @media(min-width:1024px){#match .duty-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
 /* r27 finding 2c: stacked widths, chip pulled down so the front layer stays 40px+ below the h1 */
 @media(max-width:1023px){html body .hero .wrap>.hx{margin-top:92px}.hx-chip{top:8%}}
+/* r27 finding 2d: chip below the header, meter inside the left edge, short label */
+.hx-chip{top:9%}
+@media(max-width:767px){html body .hx-meter{left:11%!important;width:50%!important}html body .hx-meter .hx-k{letter-spacing:.06em}}
+@media(min-width:1024px){.hx-chip{top:8%}}
 </style><script id="r27js">(function(){'use strict';var R=document.documentElement,hx=document.querySelector('.hx');if(!hx)return;
 var rm=matchMedia('(prefers-reduced-motion:reduce)');
 function still(){return rm.matches||R.classList.contains('calm')}
