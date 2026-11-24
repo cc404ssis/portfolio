@@ -1,0 +1,4 @@
+rural_asphalt_road_1k.hdr
+Rural Asphalt Road HDRI by Alexander Scholten, via Poly Haven.
+Source: https://polyhaven.com/a/rural_asphalt_road
+Licence: CC0 1.0 Universal (public domain), https://creativecommons.org/publicdomain/zero/1.0/
