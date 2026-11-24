@@ -4374,7 +4374,7 @@ html{scroll-padding-top:80px}
 html body section[id],html body [id].wrap,html body h1[id],html body h2[id],html body h3[id]{scroll-margin-top:104px}
 html body h2[id],html body h3[id]{scroll-margin-top:80px}
 /* ===== r28 fault 1: drawn size stays light, hit area is a centred 44px box on every control ===== */
-html body .acts .btn,html body .acts .btn.alt,html body #p-calendar .cal-it,html body .cs-morebtn,html body .bar .jump summary,html body .dock #pause.pause{position:relative}
+html body .acts .btn,html body .acts .btn.alt,html body #p-calendar .cal-it,html body .cs-morebtn,html body .bar .jump summary{position:relative}
 html body .acts .btn::before,html body #p-calendar .cal-it::before,html body .cs-morebtn::before,html body .bar .jump summary::before,html body .dock #pause.pause::before{content:"";position:absolute!important;inset:auto!important;left:50%!important;top:50%!important;right:auto!important;bottom:auto!important;width:max(100%,44px)!important;height:44px!important;transform:translate(-50%,-50%)!important;background:transparent}
 /* hero copy column ends clear of the next section's overlap (the facts section pulls up 108px) */
 @media(min-width:1024px){html body .hero>.wrap:not(#_z){padding-bottom:calc(36px + 116px)!important}}
@@ -4383,6 +4383,13 @@ html body .hero .acts{position:relative;z-index:6}
 @media(max-width:1023px){.hx-meter{transform:translateZ(calc(var(--z)*var(--zk,1.5)*(1 + var(--hs,0)*.2))) translate(calc(28px + var(--hs,0)*52px),calc(var(--hs,0)*6px))}
 .hx-chip{transform:translateZ(calc(var(--z)*var(--zk,1.5)*(1 + var(--hs,0)*.2))) translate(calc(var(--hs,0)*-30px),0)}}
 @media(min-width:768px) and (max-width:1023px){.hx-meter{transform:translateZ(calc(var(--z)*var(--zk,1.5)*(1 + var(--hs,0)*.2))) translate(calc(60px + var(--hs,0)*60px),calc(var(--hs,0)*6px))}}
+
+/* ===== r28 tap fix (lead): pause keeps its own fixed/relative position per width, so it stays on screen at 1024+ ===== */
+/* calendar items: the button clipped its own 44px hit box */
+html body #p-calendar .cal-it{overflow:visible!important}
+/* carousel "more": a real 46px box, and the "Why this slide" panel no longer sits over it on stacked widths */
+html body #p-carousel .cs-morebtn{height:46px!important;min-height:46px!important;overflow:visible!important}
+@media(max-width:899px){html body #p-carousel .cs-panel{margin-top:28px!important}}
 </style><script id="r28js">(function(){var h=document.documentElement,hero=document.getElementById('top'),t=0;if(!hero)return;
 function f(){t=0;var r=hero.getBoundingClientRect();h.classList.toggle('in-hero',r.bottom>160&&r.top<innerHeight*.6)}
 function q(){if(!t)t=requestAnimationFrame(f)}
