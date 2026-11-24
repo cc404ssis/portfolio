@@ -1,0 +1,8 @@
+Model: Mercedes-Benz S600 W220 2005 (US-Spec)
+Source: https://sketchfab.com/3d-models/mercedes-benz-s600-w220-2005-us-spec-b347ac28947f4d2db9da222772401fdd
+Author: DEMON_SCARY1235 (https://sketchfab.com/szymonpasterczyk734); the Sketchfab download dialog showed the display name Merc_TV.
+Licence: CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/). Author must be credited. Commercial use is allowed.
+Downloaded: 2026-11-24 15:14 NZDT by Chris (his Sketchfab account, gmail cc), glTF converted format, zip 1,611,250 B.
+Files: scene.gltf (373,683 B), scene.bin (5,336,608 B), license.txt (the Sketchfab original).
+Credit shown on the viewer (merc-3d-r6.html setNote): Mercedes-Benz S600 W220 2005 (US-Spec) by DEMON_SCARY1235, CC BY 4.0, each part linked.
+If the car faces the wrong way add ?rot=180 to the URL.
