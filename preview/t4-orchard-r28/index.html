@@ -4375,7 +4375,7 @@ html body section[id],html body [id].wrap,html body h1[id],html body h2[id],html
 html body h2[id],html body h3[id]{scroll-margin-top:80px}
 /* ===== r28 fault 1: drawn size stays light, hit area is a centred 44px box on every control ===== */
 html body .acts .btn,html body .acts .btn.alt,html body #p-calendar .cal-it,html body .cs-morebtn,html body .bar .jump summary,html body .dock #pause.pause{position:relative}
-html body .acts .btn::before,html body #p-calendar .cal-it::before,html body .cs-morebtn::before,html body .bar .jump summary::before,html body .dock #pause.pause::before{content:"";position:absolute;inset:auto;left:50%;top:50%;width:max(100%,44px);height:44px;transform:translate(-50%,-50%);background:transparent}
+html body .acts .btn::before,html body #p-calendar .cal-it::before,html body .cs-morebtn::before,html body .bar .jump summary::before,html body .dock #pause.pause::before{content:"";position:absolute!important;inset:auto!important;left:50%!important;top:50%!important;right:auto!important;bottom:auto!important;width:max(100%,44px)!important;height:44px!important;transform:translate(-50%,-50%)!important;background:transparent}
 /* hero copy column ends clear of the next section's overlap (the facts section pulls up 108px) */
 @media(min-width:1024px){html body .hero>.wrap:not(#_z){padding-bottom:calc(36px + 116px)!important}}
 html body .hero .acts{position:relative;z-index:6}
