@@ -124,7 +124,8 @@ details[open] summary::after{transform:rotate(-135deg)}
 @media (max-width:700px){
  /* r14m phone pass: small, quiet, the car owns the screen. Visible controls small; hit areas stay 44 via ::before */
  html,body{font-size:12px}
- #top{padding:calc(6px + env(safe-area-inset-top)) 10px 0;gap:2px}
+ #top{padding:calc(10px + env(safe-area-inset-top)) 10px 0;gap:0}
+ #crb::before{top:-13px;bottom:-13px}
  #top::before{bottom:-14px;background:linear-gradient(rgba(214,216,219,.6) 0,rgba(214,216,219,.3) 60%,rgba(214,216,219,0))}
  .row1{position:relative;z-index:3;flex-wrap:nowrap;gap:8px;min-height:28px;justify-content:space-between}
  .brand{flex:1 1 auto;display:flex;align-items:baseline;gap:6px;font-size:13px;font-weight:600;padding-left:2px;transition:opacity .15s;min-width:0;overflow:hidden}
@@ -142,7 +143,7 @@ details[open] summary::after{transform:rotate(-135deg)}
  #res{top:34px;border-radius:10px}
  #res button{font-size:12px;padding:6px 12px;min-height:44px}
  #res b{font-weight:500}#res i{font-size:10px}
- #chips{gap:5px;padding:11px 0;margin:-7px 0}
+ #chips{gap:5px;padding:12px 0;margin:0}
  .chip{height:22px;padding:0 9px;font-size:11px;gap:5px;border-radius:11px;background:rgba(16,20,26,.7)}
  .chip::before{inset:-11px -3px}
  .dot{width:6px;height:6px}
@@ -153,7 +154,7 @@ details[open] summary::after{transform:rotate(-135deg)}
  .seg button{height:22px;padding:0 9px;font-size:11px;border-radius:6px}
  .seg button::before{inset:-11px -2px}
  .ib{width:26px;height:26px;border-radius:8px;background:rgba(16,20,26,.7)}
- .ib::before{inset:-9px}
+ .ib::before{inset:-11px}
  .ib svg{width:13px;height:13px}
  #note{left:auto;right:10px;text-align:right;bottom:calc(8px + env(safe-area-inset-bottom) + var(--sheet));max-width:min(240px,calc(100vw - 20px));font-size:10.5px;line-height:18px;padding:2px 8px;background:rgba(10,12,16,.6)}
  #crl a{height:44px;line-height:44px;font-size:11px}
