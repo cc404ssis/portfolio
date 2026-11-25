@@ -143,9 +143,9 @@ details[open] summary::after{transform:rotate(-135deg)}
  #res{top:34px;border-radius:10px}
  #res button{font-size:12px;padding:6px 12px;min-height:44px}
  #res b{font-weight:500}#res i{font-size:10px}
- #chips{gap:5px;padding:12px 0;margin:0}
+ #chips{gap:5px;padding:12px 0 14px;margin:0 0 -2px}
  .chip{height:22px;padding:0 9px;font-size:11px;gap:5px;border-radius:11px;background:rgba(16,20,26,.7)}
- .chip::before{inset:-11px -3px}
+ .chip::before{inset:-13px -3px}
  .dot{width:6px;height:6px}
  #hint{top:72px;font-size:11px;padding:2px 9px}
  #paint{display:none}
@@ -763,7 +763,7 @@ function declutter(force){
  cls.forEach(m=>{
   if(m.length===1&&!m[0].edge)return;
   m.forEach(p=>p.sp.visible=false);
-  let cx=0,cy=0;m.forEach(p=>{cx+=p.q.x;cy+=p.q.y});cx/=m.length;cy/=m.length;
+  let cx=0,cy=0;m.forEach(p=>{cx+=p.q.x;cy+=p.q.y});cx/=m.length;cy/=m.length;if(mobile()){cx=Math.max(24,Math.min(innerWidth-24,cx));cy=Math.max(24,Math.min(innerHeight-24,cy))}
   const cnt={};m.forEach(p=>{const g=groupOf(p.id);cnt[g]=(cnt[g]||0)+1});
   const dom=Object.keys(cnt).sort((a,b)=>cnt[b]-cnt[a])[0];
   let b=clBtns[k];if(!b){b=document.createElement('button');b.className='clb num';host.appendChild(b);clBtns[k]=b}
