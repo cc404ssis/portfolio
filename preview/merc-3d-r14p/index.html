@@ -323,7 +323,7 @@ const BOX={},CEN={};
 Object.keys(PARTS).forEach(id=>{BOX[id]=shapeBox(id);CEN[id]=BOX[id].getCenter(new THREE.Vector3());});
 
 const S={sel:null,view:'solid',sys:null,hits:null,p:0,e:0,offX:0,offY:0,offXT:0,offYT:0,modelLoaded:false,ready:false,paint:0};
-let HOLDCAM=false;let SW=0,swT=0;let floor=null,lastAct=performance.now(),turnMs=0,lastT=0;function noteAct(){lastAct=performance.now();turnMs=0}
+let HOLDCAM=false,HOLDP=null,HOLDT=null;let SW=0,swT=0;let floor=null,lastAct=performance.now(),turnMs=0,lastT=0;function noteAct(){lastAct=performance.now();turnMs=0}
 const dayHide=[],LIGHTS={};let renderer,scene,camera,controls,car,shell,internals,pins={},pinList=[],shellMats=[],segs=[],dirty=true;
 const tweens=[];
 const ease=t=>t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2;
@@ -886,6 +886,7 @@ function frame(now){
  if(S.offX!==S.offXT||S.offY!==S.offYT||!camera.view?.enabled){const k=RM?1:.18;S.offX+=(S.offXT-S.offX)*k;S.offY+=(S.offYT-S.offY)*k;if(Math.abs(S.offXT-S.offX)<.4)S.offX=S.offXT;if(Math.abs(S.offYT-S.offY)<.4)S.offY=S.offYT;
   camera.setViewOffset(innerWidth,innerHeight,S.offX,S.offY,innerWidth,innerHeight);dirty=true}
  if(!RM&&scene.environment&&S.view==='solid'&&!S.sel&&!document.hidden&&now-swT>40){SW+=Math.min(100,now-swT)*.00007;swT=now;scene.environmentRotation.y=.55*Math.sin(SW*Math.PI*2*1.0);dirty=true}
+ if(HOLDCAM){if(!HOLDP){HOLDP=camera.position.clone();HOLDT=controls.target.clone()}camera.position.copy(HOLDP);controls.target.copy(HOLDT)}else HOLDP=null;
  if(controls.update())dirty=true;
  if(!RM&&S.sel&&pins[S.sel]&&pins[S.sel].visible){pins[S.sel].scale.setScalar(.04*(1+.09*Math.sin(now/230)));dirty=true}
  if(dirty){dirty=false;renderer.render(scene,camera);declutter(false)}
