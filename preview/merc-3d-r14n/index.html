@@ -665,7 +665,7 @@ function homeCam(){
 }
 /* r14n: fit the car's bounding box (car space x -2.52..2.58, y 0..1.46, z +-.98) into the free rectangle (between top chrome and bottom bar).
    Bisect the camera distance on the projected box so the width fills FILL of the free width (height capped at HCAP of the free height), then re-centre the target on the projected box. */
-const FILL=+(P.get('fill')||.99),HCAP=+(P.get('hcap')||1);
+const FILL=+(P.get('fill')||.99),HCAP=+(P.get('hcap')||1.04);
 function fitCam(dir){
   const F=S.free||{fw:1,fh:1};const cam=new THREE.PerspectiveCamera(camera.fov,camera.aspect,.1,260);
   const cs=[];for(const x of [-2.52,2.58])for(const y of [0,1.46])for(const z of [-.98,.98])cs.push(new THREE.Vector3(x,y,z));
