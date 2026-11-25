@@ -747,7 +747,7 @@ function declutter(force){
  if(!camera||!pinList.length)return;
  const want=pinList.filter(sp=>sp.userData.want);
  const ch=$('#chips').getBoundingClientRect(),TS=ch.height?ch.bottom+26:0;
- const pts=[];want.forEach(sp=>{const q=pinScreen(sp);if(!q)return;const edge=q.y<TS&&S.sel!==sp.userData.part;if(edge)q.y=TS;pts.push({sp,q,id:sp.userData.part,edge})});
+ const pts=[];want.forEach(sp=>{const q=pinScreen(sp);if(!q)return;const sideOut=mobile()&&(q.x<26||q.x>innerWidth-26);const edge=(q.y<TS||sideOut)&&S.sel!==sp.userData.part;if(edge&&q.y<TS)q.y=TS;pts.push({sp,q,id:sp.userData.part,edge})});
  pts.sort((a,b)=>(S.sel===b.id)-(S.sel===a.id));
  const used=new Set(),cls=[];
  pts.forEach(a=>{if(used.has(a))return;used.add(a);const m=[a];
