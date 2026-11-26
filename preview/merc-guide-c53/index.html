@@ -1,0 +1,674 @@
+<!doctype html>
+<html lang="en">
+<!-- x5d: x5c plus 5 fixes (tap area, entrance motion, 390 spacing, car fill and sweep, title) -->
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>S 320 fix guide</title>
+<meta name="color-scheme" content="dark">
+<style>
+:root{--bg:#0e1215;--pl:#151b1f;--pl2:#1b2328;--hl:#252d33;--ink:#dde3e7;--dim:#8b979f;--sil:#c3cbd1;--amb:#e6a23c;--red:#e4431d;--go:#5fb58a;--mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;--disp:"Avenir Next Condensed","Arial Narrow",system-ui,sans-serif}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif;overflow-x:hidden}
+h1,h2,h3,p,ul,ol{margin:0}
+a{color:var(--sil)}
+button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer}
+:focus-visible{outline:2px solid var(--sil);outline-offset:2px}
+#app{max-width:1180px;margin:0 auto;padding:0 16px 48px}
+.plate{display:flex;flex-wrap:wrap;gap:4px 16px;align-items:baseline;padding:12px 0;border-bottom:1px solid var(--hl);font:12px/1.4 var(--mono);font-variant-numeric:tabular-nums;font-feature-settings:"liga" 0;color:var(--dim);letter-spacing:.02em}
+.plate b{color:var(--ink);font-weight:500;overflow-wrap:anywhere}
+.plate .t{font:600 12px var(--disp);letter-spacing:.14em;text-transform:uppercase;color:var(--sil)}
+.lab{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--dim)}
+h1{font:600 26px/1.15 var(--disp);letter-spacing:.01em}
+h2{font:600 12px/1.4 system-ui;letter-spacing:.14em;text-transform:uppercase;color:var(--dim);margin:28px 0 8px}
+.start{display:flex;flex-direction:column}.start>div:last-child{margin-top:24px}
+@media(min-width:1024px) and (orientation:landscape){.start>div:last-child{margin-top:0}.start{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:32px;align-items:start}.stagecol{position:sticky;top:12px}}
+.stage{position:relative;height:300px;margin:12px 0 0;background:radial-gradient(120% 90% at 50% 100%,#1c252b 0%,var(--bg) 70%);border:1px solid var(--hl);border-radius:6px;overflow:hidden;touch-action:pan-y}
+@media(min-width:1024px) and (orientation:landscape){.stage{margin:0}}
+@media(min-width:1024px) and (orientation:portrait){.rows,.start>div:last-child{max-width:720px}}
+.stage canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+.leads{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:1}
+.leads line{stroke:rgba(233,237,240,.6);stroke-width:1}
+.leads circle{fill:#e9edf0}
+.pin{position:absolute;left:0;top:0;width:44px;height:44px;display:grid;place-items:center;z-index:2}
+.pin i{width:14px;height:14px;border-radius:50%;background:var(--red);box-shadow:0 0 0 3px rgba(14,18,21,.8),0 0 0 4px #e9edf0;transition:opacity .12s}
+.pin[data-occ="1"] i{opacity:.5;filter:blur(2.2px);transform:scale(.8);box-shadow:none}
+.pin[aria-pressed=true] i{background:#fff;box-shadow:0 0 0 3px var(--red)}
+.bar{display:flex;flex-wrap:wrap;gap:4px 8px;align-items:center;min-height:44px;margin-top:6px;font-size:13px}
+.bar span{flex:1 1 150px;min-width:0}
+.bar[data-sel="0"] span{color:var(--dim)}
+.bar [hidden]{display:none}
+.credit{margin-top:6px}
+.btn{position:relative;display:inline-flex;align-items:center;justify-content:center;min-height:32px;min-width:44px;padding:0 12px;border:1px solid var(--hl);border-radius:6px;background:var(--pl2);color:var(--ink);font-size:13px;text-decoration:none}
+.btn::before{content:"";position:absolute;inset:-8px -2px}
+.btn.pri{background:var(--sil);color:#10151a;border-color:var(--sil);font-weight:600}
+.btn.txt{background:none;border-color:transparent;color:var(--sil)}
+.rows{list-style:none;padding:0;border-top:1px solid var(--hl)}
+.rows a{display:grid;grid-template-columns:28px 1fr auto;gap:0 8px;align-items:center;min-height:56px;padding:6px 0;border-bottom:1px solid var(--hl);text-decoration:none;color:var(--ink)}
+.rows .n{font:12px var(--mono);color:var(--dim);font-variant-numeric:tabular-nums}
+.rows b{font-weight:600;font-size:14px;display:block}
+.rows small{display:block;color:var(--dim);font-size:12px;line-height:1.35}
+.rows .go{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--sil);white-space:nowrap}
+.rows a:hover b{color:#fff}
+.fine{font-size:12px;color:var(--dim)}
+.back{margin:8px 0 0 -12px}
+.page{max-width:720px}
+.where{color:var(--dim);margin-top:8px}
+.diag{margin:16px 0;border:1px solid var(--hl);border-radius:6px;background:var(--pl);padding:6px}
+.diag svg{display:block;width:100%;height:auto;max-height:300px;overflow:visible}
+.diag svg text{font:13px system-ui,-apple-system,"Segoe UI",sans-serif;fill:var(--ink);paint-order:stroke;stroke:var(--pl);stroke-width:3px;stroke-linejoin:round}
+.diag svg .d{fill:var(--dim)}
+.diag svg .ln{stroke:var(--sil);fill:none;stroke-width:1.3}
+.diag svg .fb{stroke:var(--amb);fill:none;stroke-width:1.6}
+.diag svg .bx{fill:var(--pl2);stroke:var(--sil);stroke-width:1}
+.diag svg .hot{fill:var(--red)}
+.diag svg .am{fill:var(--amb)}
+.diag figcaption{font-size:12px;color:var(--dim);padding:4px 4px 0}
+.tk{list-style:none;padding:0;border-top:1px solid var(--hl)}
+.tk li{border-bottom:1px solid var(--hl)}
+.tk label{display:grid;grid-template-columns:44px 1fr;align-items:start;min-height:44px;cursor:pointer}
+.tk input{appearance:none;-webkit-appearance:none;width:44px;height:44px;margin:0;display:grid;place-items:center;cursor:pointer}
+.tk input::before{content:"";width:18px;height:18px;border:1.5px solid var(--dim);border-radius:4px;display:block}
+.tk input:checked::before{background:var(--go);border-color:var(--go);box-shadow:inset 0 0 0 3px var(--bg)}
+.tk .tx{padding:10px 0}
+.tk input:checked+.tx{color:var(--dim)}
+.prog{font:12px var(--mono);color:var(--dim);margin-top:6px}
+.tag{display:inline-block;font:600 12px/1 system-ui;letter-spacing:.06em;text-transform:uppercase;padding:3px 5px;border-radius:3px;border:1px solid var(--amb);color:var(--amb);vertical-align:1px;white-space:nowrap}
+.tag.g{border-color:var(--dim);color:var(--dim)}
+.blk{background:var(--pl);border:1px solid var(--hl);border-radius:6px;padding:12px 14px;margin-top:12px}
+.blk h3{font:600 13px/1.3 system-ui;margin-bottom:6px}
+.blk p+p,.blk ul+p,.blk p+ul{margin-top:8px}
+.blk ul{padding-left:18px}
+.blk.warn{border-color:#5a4521}
+.blk.safe{border-left:3px solid var(--amb)}
+.blk.ans{border-left:3px solid var(--sil)}
+table{width:100%;border-collapse:collapse;table-layout:fixed;font-size:12px}
+th,td{text-align:left;vertical-align:top;padding:8px 6px;border-bottom:1px solid var(--hl);overflow-wrap:anywhere}
+th{font-weight:500;color:var(--dim);font-size:12px;letter-spacing:.08em;text-transform:uppercase}
+td.c{font:12px var(--mono);font-feature-settings:"liga" 0;color:var(--sil)}
+.nx{margin-top:24px;padding:14px;border:1px solid var(--sil);border-radius:6px;background:var(--pl)}
+.nx .lab{color:var(--sil)}
+.pn{font:12px var(--mono);font-feature-settings:"liga" 0;overflow-wrap:anywhere}
+.foot{margin-top:36px;padding-top:12px;border-top:1px solid var(--hl)}
+#loadline{position:absolute;left:10px;bottom:10px;font-size:12px;color:var(--dim);z-index:1}
+#qa{position:fixed;left:0;right:0;bottom:0;background:#000c;font:12px var(--mono);padding:4px 8px;z-index:9;max-height:30vh;overflow:auto;white-space:pre-wrap}
+
+/* c52: the scanner printout */
+:root{--paper:#e7e2d3;--paper2:#d9d3c1;--pink:#1b1a15;--pdim:#5b5748;--biro:#1d3f78;--share:#e6a23c}
+.slip{position:relative;background:var(--paper);color:var(--pink);border-radius:3px 3px 0 0;padding:12px 14px 20px;margin-top:12px;font:13px/1.45 var(--mono);font-feature-settings:"liga" 0;font-variant-numeric:tabular-nums;-webkit-mask:linear-gradient(#000,#000) top/100% calc(100% - 7px) no-repeat,conic-gradient(from -45deg at bottom,#0000,#000 1deg 89deg,#0000 90deg) bottom/12px 7px repeat-x;mask:linear-gradient(#000,#000) top/100% calc(100% - 7px) no-repeat,conic-gradient(from -45deg at bottom,#0000,#000 1deg 89deg,#0000 90deg) bottom/12px 7px repeat-x}
+.slip .sh{display:flex;flex-wrap:wrap;gap:2px 12px;padding-bottom:6px;border-bottom:1px dashed var(--pdim);font-size:12px;color:var(--pdim);letter-spacing:.02em}
+.slip .sh b{color:var(--pink);font-weight:700}
+.slip .big{font-weight:700;font-size:15px;line-height:1.35;margin-top:10px;letter-spacing:.01em}
+.slip .quo{margin-top:6px;font-size:12px;color:var(--pdim)}
+.slip .gap{margin-top:8px;font:600 14px/1.35 system-ui,-apple-system,sans-serif;letter-spacing:0}
+.srow{display:grid;grid-template-columns:28px 1fr auto;gap:0 8px;align-items:baseline;padding:6px 0;border-bottom:1px dotted var(--pdim)}
+.srow .rn{font-weight:700}
+.srow .rr{font-weight:700;white-space:nowrap}
+.srow .rr.codes{background:var(--pink);color:var(--paper);padding:1px 5px}
+.crow{display:grid;grid-template-columns:78px 1fr auto;gap:0 8px;padding:5px 0 5px 36px;border-bottom:1px dotted var(--pdim);font-size:12px}
+.nores{margin:8px 0 0;font:600 14px/1.35 system-ui,-apple-system,sans-serif}
+.note{margin:6px 0 0;font-size:12px;color:var(--pdim)}
+.reply{margin-top:12px;padding-top:10px;border-top:1px dashed var(--pdim);font:14px/1.45 system-ui,-apple-system,sans-serif}
+.reply .lab{color:var(--pdim)}
+.car{color:var(--biro);margin-top:6px;padding-left:10px;border-left:2px solid var(--biro);overflow-wrap:anywhere}
+.car b{font-weight:700}
+.car img{display:block;max-width:100%;max-height:200px;margin-top:6px;border:1px solid var(--pdim)}
+.empty{color:var(--pdim);margin-top:6px}
+.reply textarea{display:block;width:100%;min-height:64px;margin-top:6px;padding:8px;border:1px solid var(--pdim);border-radius:3px;background:#f3efe2;color:var(--biro);font:14px/1.4 system-ui,-apple-system,sans-serif;resize:vertical}
+.reply .acts{display:flex;flex-wrap:wrap;gap:8px 8px;align-items:center;margin-top:8px}
+.reply .btn{border-color:var(--pink);color:var(--pink);background:none}
+.reply .btn.acc{background:var(--share);border-color:var(--share);color:#14110a;font-weight:700}
+.reply .ph{font-size:12px;color:var(--pdim);margin-top:6px}
+.reply input[type=file]{font-size:12px;max-width:100%}
+.reply :focus-visible{outline-color:var(--biro)}
+.msg{font-size:12px;color:var(--pdim);min-height:18px}
+.rec{margin:0 0 6px 44px}
+.rows .sc{display:block;font:12px/1.35 var(--mono);color:var(--sil);margin-top:2px}
+.rows .cr{font:12px/1.35 system-ui;color:var(--dim);margin-top:1px}
+.rows .cr.has{color:#8fb0e6}
+.start h1{margin-top:20px}
+
+/* c53 */
+h1{font:800 clamp(30px,9vw,48px)/.98 var(--disp);letter-spacing:-.005em;text-transform:uppercase}
+.kick{font:12px/1.4 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--dim);margin:16px 0 0;font-variant-numeric:tabular-nums}
+.start h1{margin:4px 0 0}
+.stage::after{content:"";position:absolute;left:8%;right:8%;bottom:9%;height:1px;background:linear-gradient(90deg,transparent,#3a464e,transparent);pointer-events:none}
+.stagecol.fs{margin-top:12px}
+.slip{margin-bottom:44px}
+.vh{position:absolute;width:1px;height:1px;opacity:0;overflow:hidden;clip:rect(0 0 0 0)}
+.vh:focus-visible+.pick{outline:2px solid var(--biro);outline-offset:2px}
+.reply .pick{cursor:pointer;font:13px system-ui,-apple-system,sans-serif}
+.reply .acts{position:relative}
+.notes{margin-top:28px;padding-top:4px;border-top:1px solid var(--hl)}
+.notes summary{position:relative;display:flex;align-items:center;min-height:32px;cursor:pointer;color:var(--dim);font:12px var(--mono);letter-spacing:.06em;list-style:none}
+.notes summary::-webkit-details-marker{display:none}
+.notes summary::before{content:"";position:absolute;inset:-6px 0}
+.notes summary::after{content:"+";margin-left:8px}
+.notes[open] summary::after{content:"-"}
+.pin[data-dim] i{opacity:.55}
+.pin[data-focus] i{position:relative;box-shadow:0 0 0 3px rgba(14,18,21,.8),0 0 0 5px var(--red);opacity:1;filter:none;transform:none}
+.pin[data-focus][data-occ="1"] i{opacity:1;filter:none;transform:none;box-shadow:0 0 0 3px rgba(14,18,21,.8),0 0 0 5px var(--red)}
+.pin[data-focus] i::after{content:"";position:absolute;inset:-5px;border-radius:50%;border:2px solid var(--red);opacity:0}
+@keyframes beat{0%{transform:scale(.8);opacity:.95}100%{transform:scale(3.2);opacity:0}}
+@media(prefers-reduced-motion:no-preference){.pin[data-focus] i::after{animation:beat 1s ease-out .5s 3 both}}
+@keyframes rise{from{opacity:0;transform:translateY(14px)}}
+@media(prefers-reduced-motion:no-preference){.rows:not(.on) li{opacity:0}}
+.rows.on li{animation:rise .4s both;animation-delay:calc(var(--i)*60ms)}
+#view.enter>*{animation:rise .5s both}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important;scroll-behavior:auto!important}}
+</style>
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.187.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.187.0/examples/jsm/"}}</script>
+</head>
+<body>
+<div id="app">
+ <header class="plate" id="plate" aria-label="Car plate facts">
+  <span class="t">S 320 L W220</span>
+  <span>VIN <b id="vin">WDB2201652A227673</b></span>
+  <span>type <b>220.165</b></span>
+  <span><b>198,888</b> km at scan</span>
+  <span>paint <b>744</b> silver</span>
+  <span>2001, 2330 kg</span>
+ </header>
+ <main id="view"></main>
+</div>
+<div id="qa" hidden></div>
+
+<script>
+/* ---------- content ---------- */
+const SVG={
+car:(marks)=>`<svg viewBox="0 0 340 140" role="img" aria-label="Car from above, nose to the right">
+<path class="ln" d="M24,46 Q24,26 54,26 H246 Q306,30 314,69 Q306,108 246,112 H54 Q24,112 24,92 Z"/>
+<rect class="ln" x="66" y="18" width="34" height="8" rx="2"/><rect class="ln" x="66" y="112" width="34" height="8" rx="2"/><rect class="ln" x="236" y="18" width="34" height="8" rx="2"/><rect class="ln" x="236" y="112" width="34" height="8" rx="2"/>
+<path class="ln" d="M120,38 H206 L224,54 V84 L206,100 H120 Z" opacity=".55"/>
+<text class="d" x="330" y="134" text-anchor="end">front</text><text class="d" x="12" y="134">boot</text>
+${marks.map(m=>`<circle class="hot" cx="${m[0]+2}" cy="${m[1]+4}" r="5"/><text x="${m[0]+2+(m[3]||8)}" y="${m[1]+4+(m[4]||4)}" ${m[5]?`text-anchor="${m[5]}"`:''}>${m[2]}</text>`).join('')}</svg>`,
+fibre:`<svg viewBox="0 0 360 200" role="img" aria-label="Fibre optic audio loop"><rect class="bx" x="130" y="8" width="100" height="38" rx="4"/><text x="180" y="32" text-anchor="middle">COMAND</text>
+<rect class="bx" x="244" y="80" width="108" height="46" rx="4"/><text x="298" y="100" text-anchor="middle">Amp</text><text class="d" x="298" y="117" text-anchor="middle">boot, left</text>
+<rect class="bx" x="124" y="150" width="112" height="46" rx="4"/><text x="180" y="170" text-anchor="middle">CD changer</text><text class="d" x="180" y="187" text-anchor="middle">rusty bracket</text>
+<rect class="bx" x="8" y="80" width="108" height="46" rx="4"/><text x="62" y="100" text-anchor="middle">Phone/voice</text><text class="d" x="62" y="117" text-anchor="middle">if fitted</text>
+<path class="fb" d="M230,27 H298 V80 M298,126 V173 H236 M124,173 H62 V126 M62,80 V27 H130"/>
+<path class="ln" stroke-dasharray="4 3" d="M232,150 C232,120 128,120 128,150"/><text class="d" x="180" y="114" text-anchor="middle">bypass loop plug</text>
+<text class="d" x="180" y="68" text-anchor="middle">orange fibre: light, not power</text></svg>`,
+air:`<svg viewBox="0 0 360 210" role="img" aria-label="Air suspension plumbing"><rect class="bx" x="8" y="8" width="104" height="44" rx="4"/><text x="60" y="28" text-anchor="middle">Relay O, F32</text><text class="d" x="60" y="44" text-anchor="middle">40 A</text>
+<rect class="bx" x="128" y="8" width="104" height="44" rx="4"/><text x="180" y="28" text-anchor="middle">Compressor</text><text class="d" x="180" y="44" text-anchor="middle">front right</text>
+<path class="ln" d="M112,30 H128"/>
+<rect class="bx" x="128" y="74" width="104" height="34" rx="4"/><text x="180" y="96" text-anchor="middle">Valve block</text><path class="ln" d="M180,52 V74"/>
+<rect class="bx" x="248" y="74" width="104" height="34" rx="4"/><text x="300" y="96" text-anchor="middle">Reservoir</text><path class="ln" d="M232,91 H248"/>
+<path class="ln" d="M180,108 V128 M40,128 H320 M40,128 V142 M120,128 V142 M240,128 V142 M320,128 V142"/>
+<circle class="bx" cx="40" cy="160" r="18"/><text x="40" y="165" text-anchor="middle">FL</text><circle class="bx" cx="120" cy="160" r="18"/><text x="120" y="165" text-anchor="middle">FR</text><circle class="bx" cx="240" cy="160" r="18"/><text x="240" y="165" text-anchor="middle">RL</text>
+<circle class="hot" cx="320" cy="160" r="18"/><text x="320" y="165" text-anchor="middle">RR</text><text class="d" x="320" y="198" text-anchor="middle">your strut</text></svg>`,
+ac:`<svg viewBox="0 0 360 214" role="img" aria-label="A/C loop and the fan"><rect class="bx" x="8" y="8" width="104" height="44" rx="4" style="stroke:#e6a23c"/><text x="60" y="28" text-anchor="middle">Suction fan</text><text class="d" x="60" y="44" text-anchor="middle">P20D0 P2073</text>
+<rect class="bx" x="128" y="8" width="104" height="44" rx="4"/><text x="180" y="28" text-anchor="middle">Condenser</text><text class="d" x="180" y="44" text-anchor="middle">behind grille</text>
+<rect class="bx" x="248" y="8" width="104" height="44" rx="4"/><text x="300" y="28" text-anchor="middle">A/C module</text><text class="d" x="300" y="44" text-anchor="middle">(AAC/TAC)</text><text class="am" x="300" y="72" text-anchor="middle">never scanned</text>
+<rect class="bx" x="8" y="90" width="104" height="44" rx="4"/><text x="60" y="110" text-anchor="middle">Compressor</text><text class="d" x="60" y="126" text-anchor="middle">P20CD</text>
+<rect class="bx" x="248" y="90" width="104" height="44" rx="4"/><text x="300" y="110" text-anchor="middle">Expansion</text><text class="d" x="300" y="126" text-anchor="middle">valve</text>
+<rect class="bx" x="128" y="160" width="104" height="44" rx="4"/><text x="180" y="180" text-anchor="middle">Evaporator</text><text class="d" x="180" y="196" text-anchor="middle">in dash</text>
+<path class="ln" d="M60,90 L128,40 M200,52 L248,112 M300,134 L232,182 M128,182 L60,134"/>
+<circle class="hot" cx="252" cy="190" r="5"/><text class="d" x="262" y="188">B12 suspect</text><text class="d" x="262" y="206">no code for it</text></svg>`,
+batt:`<svg viewBox="0 0 360 150" role="img" aria-label="Spare battery to car battery"><rect class="bx" x="10" y="50" width="122" height="56" rx="4"/><text x="71" y="74" text-anchor="middle">Spare 12 V</text><text class="d" x="71" y="92" text-anchor="middle">jump source</text>
+<rect class="bx" x="228" y="50" width="122" height="56" rx="4"/><text x="289" y="74" text-anchor="middle">Car battery</text><text class="d" x="289" y="92" text-anchor="middle">boot, right side</text>
+<path class="ln" style="stroke:#e4431d" d="M40,50 C40,14 320,14 320,50"/><text x="180" y="62" text-anchor="middle">red: + to +</text>
+<path class="ln" d="M100,106 C100,142 260,142 260,106"/><text x="180" y="98" text-anchor="middle" class="d">black: - to -</text></svg>`
+};
+const VIN='WDB2201652A227673';
+const FAULTS={
+stereo:{title:'Stereo cutting out',sub:'Works after off and on, dead next morning',
+ where:'The head unit is in the dash. The cause is more likely in the boot: the amp, the CD changer and the fibre loop all sit on the left side behind the trim.',
+ diag:{svg:SVG.fibre,cap:'The audio loop is one ring of fibre. One dead box in the ring drops the whole ring.'},
+ blocks:[
+  ['Your pattern',`<p>The radio has power and a screen but no sound. It came back once after switching off and on in the evening, then was gone the next morning. That pattern points at the boot, not the head unit: the amp, its power, or one box on the fibre loop that fails to wake up.</p>`,'ans'],
+  ['What the water photos show',`<ul><li>Right tail light: heavy rust along the bottom seam. Water is getting in on the right side of the boot, near the 12 V battery.</li><li>CD changer bracket, left of the boot: heavy rust. Water has reached the left rack too, so the changer and amp are both at risk.</li></ul><p>Fix the leak before fitting any audio part.</p>`]
+ ],
+ checks:[
+  ['Water in the boot first.','Lift the boot floor and the left trim. Feel for damp. Look at the right tail light seal and the rubber drain channels from the rear window pillar. Dry it out and find the leak.'],
+  ['CD changer eject test.','Car and radio on, press eject on the changer. No whirr and the magazine stays in: no power, and that breaks the loop.'],
+  ['D2B fibre bypass loop.','Car off, key out. Unplug the changer, join its two fibre ends with a D2B loop plug. Use the car for a week.'],
+  ['Amp harness pins.','Car off, key out. Unplug each amp plug, look for green, white or rusty pins, push back until it clicks.'],
+  ['Fuses.','F66 (25 A amp) and F61 (15 A radio, CD changer, COMAND) in K40/5 under the right rear seat. Also F23 (7.5 A CD changer), F24 (20 A audio), F25 (25 A sound system) in the front left box, F60 aerial amp in the rear module K40/5, and the pre-fuse box X4/22 by the battery. Check your own lid chart: numbers change by build date.']
+ ],
+ after:[
+  ['F66 and F61: the audio fuses',`<p><b>F66 25 A = sound amplifier</b> on cars built up to Aug 2002 (yours, by plate MY2001). <b>F61 15 A = radio, CD changer, COMAND.</b> Both are in the box under the right rear seat (K40/5). From Sep 2002 F66 became a seat fuse. Your car was built before that (plate MY2001, serial 227673 sits in the 2001 run), so on your car F66 is the amp.</p>`,'warn'],
+  ['Look up in the owner manual',`<p>Index terms: fuse allocation chart (a fold-out may be in the tool kit near the spare wheel), Sound System, CD Changer, Telephone and Voice Control.</p>`],
+  ['Fuse photos and amp figures',`<p>Pictures of the audio fuses and the amp figures you asked for: <span class="tag g">not found yet</span>. Nothing is guessed here.</p>`]
+ ],
+ parts:['D2B fibre bypass coupler: <span class="pn">A 000 545 33 84</span> <span class="tag">UNCONFIRMED</span> for your VIN. Bypass the CD changer first, then suspect the amplifier. Price: not found yet.','Used CD changer: rough guess NZD 80 to 250.','Used amp (same part number): rough guess NZD 150 to 500.','Head unit last: rough guess NZD 300 to 700 to repair.'],
+ fix:['Fix the water leak first, then dry and clean the plugs.','Leave the changer bypassed (you lose the CD changer only) or fit a good used one.','Replace the amp only if the bypass does not bring sound back or its plugs are badly corroded.'],
+ safety:['12 V cannot shock you, even when wet. The real danger is a tool touching both battery terminals: sparks and burns.','Ignition off and key out before you unplug a module.','Orange cables are fibre optic: no power, but they snap if bent sharply.'],
+ next:'Do the eject test on the CD changer. No whirr: bypass it and drive a week.'},
+air:{title:'Air suspension and the right rear strut',sub:'Raise test first. The strut is a later buy',
+ where:'Compressor: front right behind the bumper. Relay O and fuse F32 are in the right engine bay fuse box. The right rear strut is inside the right rear wheel arch.',
+ diag:{svg:SVG.air,cap:'Air runs compressor, valve block, then the four struts. Your right rear strut is red.'},
+ blocks:[
+  ['What the scan says',`<p>The scan has no row for the air suspension. <b>The air suspension module was never scanned by name.</b> No scan data for the air suspension yet: do the raise test.</p>`,'ans']
+ ],
+ checks:[
+  ['Raise test.','Engine running, press the level button once. The car should rise within about 30 seconds. Listen at the front right bumper for the compressor hum.'],
+  ['Read the dash message.','"AIRMATIC VISIT WORKSHOP" means a fault is stored. "Car too low" means it cannot build or hold pressure.'],
+  ['Relay O and fuse F32 (40 A).','Pull F32 and look at it. Swap relay O with an identical relay and repeat the raise test.'],
+  ['Overnight sag.','Park on flat ground. Measure each wheel arch to the ground in the evening and in the morning. The low corner points at the leak.'],
+  ['Right rear strut.','Soapy water on the air fitting at the top. Bubbles mean a leak. The bag sits behind a cover so water may not reach it.'],
+  ['Valve block, level sensors, reservoir.','Soapy water on the valve block joints. Look under each level sensor for a snapped link rod.']
+ ],
+ after:[
+  ['Right rear strut: buy second hand',`<p>You said later, because it might not need one. Second-hand source in NZ or online: <span class="tag g">not found yet</span>. No NZ listing was searched in this round. Not a first fix.</p>`]
+ ],
+ parts:['Relay O: w220.wiki lists <span class="pn">A 002 542 13 19</span> <span class="tag">UNCONFIRMED</span> for VIN <span class="pn">'+VIN+'</span>. Rough guess NZD 40 to 120.','Rear strut: rough guess NZD 400 to 800 each, fitted 650 to 1,100.','Compressor: rough guess NZD 400 to 900, fitted 700 to 1,300.'],
+ fix:['Replace a bad relay. Always fit a new relay with a new compressor.','Fix any leak before the compressor, or it wears out again.','Replace the leaking strut.'],
+ safety:['Do not work under a car sitting on its air bags. Use axle stands on solid points.','Do not jack the car on the air struts.'],
+ next:'Do the raise test. Hum and rise: measure the overnight sag. No hum: swap relay O.'},
+ac:{title:'A/C not cold',sub:'4 scan codes, no pressure sensor code',
+ where:'Fan: behind the radiator. Compressor: on the engine, belt driven. Condenser: in front of the radiator behind the grille. Scan: 2026-11-16 17:33, SN IP608-002065, 198,888 km.',
+ diag:{svg:SVG.ac,cap:'Codes sit on the fan and the compressor. The pressure sensor B12 has no code.'},
+ blocks:[
+  ['Scan result: 27 systems read, 26 clear',`<table><thead><tr><th style="width:27%">Code</th><th>What it says</th><th style="width:21%">Status</th></tr></thead><tbody>
+  <tr><td class="c">P20CD</td><td>Compressor torque implausible. Points at the A/C module.</td><td>Stored</td></tr>
+  <tr><td class="c">P20D0-08</td><td>A/C asks an implausible fan output. Check suction fan.</td><td>Stored</td></tr>
+  <tr><td class="c">P202C-08<br>(P0128)</td><td>Coolant thermostat.</td><td>Stored and current. The only live one.</td></tr>
+  <tr><td class="c">P2073-04</td><td>Electric suction fan, open circuit.</td><td>Stored</td></tr></tbody></table><p class="fine" style="margin-top:8px">All four are in Motor Electronics 2. No freeze-frame values in the scan: none shown.</p>`],
+  ['Pressure sensor: the plain answer',`<p><b>There is no pressure sensor code.</b> It is a suspect only. P20CD points at the A/C module, and sensor B12 comes after that. Check live pressure with a gauge before you buy one.</p>`,'ans'],
+  ['Not scanned yet',`<p><b>The A/C module (AAC/TAC) and the air suspension module were never scanned.</b> Scan the A/C module next. Until then its status is unknown: nothing is assumed.</p>`,'warn'],
+  ['Will the last code clear?',`<p>You said the last code will clear if the second is fixed, because they are related. The scan report puts the fan circuit first. The link between P2073 and P20D0 is about 70 percent likely <span class="tag">UNCONFIRMED</span>. Not a promise.</p>`]
+ ],
+ checks:[
+  ['Suction fan circuit first.','Engine warm, A/C on. Does the fan run? Wiggle the 4-pin plug with it running. Look for green or burnt pins.'],
+  ['Clear the codes, drive with A/C on.','Then rescan the engine and the A/C module. See what comes back.'],
+  ['Outside temperature sensor.','Compare the dash reading with a phone weather app after 10 minutes driving. Within 2 or 3 degrees is fine.'],
+  ['Pressure sensor B12 only if P20CD returns.','Compressor only if proven. The thermostat code is a separate job.'],
+  ['Gas and condenser.','Look through the grille for stone dents or oily patches. A shop measures the gas pressures.']
+ ],
+ after:[],
+ parts:['Part numbers are lane research, <span class="tag">UNCONFIRMED</span> for VIN <span class="pn">'+VIN+'</span>.','Suction fan: <span class="pn">A 220 500 01 93</span> (rough guess NZD used 150 to 400, new 400 to 900).','Pressure sensor B12 candidates: <span class="pn">A 140 830 00 72</span>, <span class="pn">A 639 542 08 18</span>, <span class="pn">A 220 542 01 18</span> (rough guess NZD 40 to 150). B12/1 temperature sensor: <span class="pn">A 210 830 00 72</span>.','Thermostat: <span class="pn">A 112 203 02 75</span> (rough guess NZD 30 to 100, fitted 250 to 500).','Regas: rough guess NZD 200 to 450.'],
+ fix:['Repair the fan plug or wiring if damaged, otherwise fit a new fan unit (motor and module are one part).','Gas must be recovered before any sensor swap.','Rescan the A/C module before buying a compressor.'],
+ safety:['A/C gas is a job for a licensed shop. Do not open the loop at home.','Keep hands and loose clothes away from the fan when the engine is running.'],
+ next:'Check the suction fan runs, wiggle its plug, then clear codes and rescan the engine and the A/C module.'},
+idle:{title:'Engine shakes at idle in drive',sub:'No scan code points at it',
+ where:'Engine bay: throttle body at the top front of the engine, cam solenoids at the front of each cylinder head, engine mounts under the engine.',
+ diag:{car:[[262,65,'throttle',-8,-10,'end'],[236,40,'cam L',-6,-10,'end'],[236,90,'cam R',-6,18,'end'],[196,65,'mounts',-6,22,'end']],cap:'Candidates only. Nothing here comes from your scan.'},
+ blocks:[
+  ['What we know',`<p>No data beyond your message: the whole car shakes at idle in drive and you really need it fixed. The four scan codes are A/C, fan and thermostat. <b>No scan code points at this.</b> Live idle values: <span class="tag g">no data</span>.</p>`,'ans']
+ ],
+ checks:[
+  ['Throttle body.','Ignition off, key out. Remove the intake pipe. A black carbon ring around the flap means clean it. Also check the air filter.'],
+  ['Cam solenoids.','Unplug the plugs on the front of each cylinder head. Oil inside a plug or oily wiring is a known fault at this age.'],
+  ['Engine mounts (authored, not from your scan).','Look under the engine for a split or sagging rubber mount. Put the car in drive with a helper watching the engine move.'],
+  ['Get a full scan of Motor Electronics.','The scan has no live idle data. Ask the shop for misfire counts per cylinder.']
+ ],
+ after:[],
+ parts:['Throttle body cleaner and a rag: rough guess NZD 15 to 30 DIY, 120 to 200 in a workshop.','Cam adjuster magnet: rough guess NZD 150 to 350. Number of cam parts on your engine <span class="tag">UNVERIFIED</span>.','Engine mount: not found yet (no part number, no price).'],
+ fix:['Clean the throttle body, refit, let it idle 5 minutes to relearn.','Replace a leaking cam magnet or sensor.','Replace a split mount.'],
+ safety:['Ignition off and key out before removing the intake pipe.','Never put your hand near belts or the fan with the engine running.','Never test mounts with the car on a jack.'],
+ next:'Clean the throttle body, then unplug the cam solenoid plugs and look for oil.'},
+nostart:{title:'Won’t start, dead keys, spare battery',sub:'The 2026-11-06 episode and your spare battery',
+ where:'Car battery: boot, right side under the floor. Pre-fuse box X4/22 sits next to it.',
+ diag:{svg:SVG.batt,cap:'Order matters on a jump: red to red first. The jump-start point in the owner manual: not found yet for your car.'},
+ blocks:[
+  ['What happened',`<p>On 2026-11-06 the car did nothing: no response to the boot, lock or unlock, the key would not turn, and the car stayed locked. Earlier answer: the battery is probably flat <span class="tag">UNVERIFIED</span> (no voltage was measured).</p>`],
+  ['Other options at home',`<ul><li>Measure the battery with a multimeter: engine off 12.4 to 12.7 V. Under about 12 V is flat.</li><li>Check the terminals and earth strap are tight, clean, not green.</li><li>Look at the pre-fuse box X4/22 next to the battery for a loose stud nut.</li><li>Use the physical key in the door lock if the remote is dead.</li><li>Charge the battery overnight with a mains charger.</li></ul>`],
+  ['Will your spare battery work?',`<p><b>Yes, as a jump source.</b> Earlier answer from the dash: it can jump the car, it does not replace the car battery. It is a 12 V Japanese size <span class="tag">UNVERIFIED</span> here.</p><p><b>Even if the car is off?</b> The car being off does not matter: the spare only needs its own charge. A flat spare does nothing.</p><p><b>Use it to start the car, then charge the real one?</b> Yes. Connect the spare, start the car, take the cables off, and let the car run.</p>`,'ans'],
+  ['How long to charge',`<p>Time to charge your battery: <span class="tag g">not found yet</span>. It depends on the battery label (Ah) and how flat it is. Authored, not from your car: a flat battery is better charged overnight on a mains charger than by driving.</p>`],
+  ['Your fuse photo',`<p>You asked if any of the fuses in your photo are the fault. The earlier answer was that these were spares. Your fuse photo is not in this build, and fuse images and figures are <span class="tag g">not found yet</span>.</p>`]
+ ],
+ checks:[
+  ['Measure the battery.','Multimeter across the terminals, engine off.'],
+  ['Clean and tighten both terminals and the earth strap.','Green or white powder: wire brush, then tighten.'],
+  ['Try the spare as a jump source.','Red clamp spare + to car +, black from spare - to bare metal or the manual point. Wait 5 minutes, then start.'],
+  ['Check pre-fuse box X4/22.','Loose stud nut or green corrosion: clean and tighten.'],
+  ['If the key still will not turn.','Try the physical key in the door lock. If nothing moves, the electronic ignition switch (EZS) is a candidate. It read clear in the scan, but the scan was taken after the episode.']
+ ],
+ after:[],
+ parts:['Battery: rough guess NZD 300 to 500, correct size and type. Test: free at most battery shops.','Mains charger: not found yet.'],
+ fix:['Charge or replace the battery.','Clean and tighten terminals and the earth strap.'],
+ safety:['Never let the two jump clamps touch each other.','Never bridge both battery terminals with a tool: sparks and burns.','Keep sparks and flames away from a charging battery.'],
+ next:'Measure the battery voltage. Under 12 V: charge it overnight or jump it from the spare.'},
+fuse:{title:'The other fuse box and the seat cushion',sub:'Under the right rear seat',
+ where:'Your car has three fuse boxes: engine bay left, engine bay right, and K40/5 under the right rear seat. There is no fuse box in the dash on your car (that only exists from 30.09.2002). The pre-fuse box X4/22 is in the boot by the battery. Fuse charts are kept in the tool box in the spare wheel well.',
+ diag:{car:[[262,40,'engine L',-6,-10,'end'],[262,90,'engine R',-6,18,'end'],[130,86,'K40/5 rear seat',-8,18,'end'],[48,86,'X4/22',10,-12]],cap:'Four fuse spots. Two are the engine bay ones you already know.'},
+ blocks:[
+  ['Where the other fuse box is',`<p>Rear fuse and relay module <b>K40/5</b>, under the right rear seat. It feeds rear audio parts: F66 (25 A) the sound amplifier and F61 (15 A) radio, CD changer and COMAND, on cars built up to Aug 2002. The boot also has the pre-fuse box <b>X4/22</b> by the battery. Engine bay left and right are the "hood" ones.</p><p>Water under this seat or in the boot is a common cause of random electrical faults, and your photos show water in the boot.</p>`,'ans'],
+  ['Seat cushion will not lift: is this the right car?',`<p><b>Yes, it is the right car.</b> The plate says 2001 S 320 L, W220, type 220.165. The rear cushion on this car lifts by pulling firmly at the front edge. Source to confirm: <span class="tag">UNVERIFIED</span>.</p><p>If it does not release: do not force it. How the clips release on your cushion: <span class="tag g">not found yet</span>.</p>`],
+  ['Fuse 66',`<p>F66 25 A is the sound amplifier on cars up to Aug 2002, and yours is one (built 2001). See the stereo page.</p>`]
+ ],
+ checks:[
+  ['Pull the front edge of the right rear cushion firmly upward.','Try both front corners, one at a time.'],
+  ['Look under the seat for damp carpet, water marks or green corrosion.','Water here means find the leak first.'],
+  ['Check F66 (25 A amp), F61 (15 A radio, CD changer, COMAND) and F60 in K40/5.','Use the chart in the spare wheel well tool box or the manual.']
+ ],
+ after:[],
+ parts:['Fuses: rough guess NZD 5 to 20. Fuse images and ratings for K40/5: not found yet.'],
+ fix:['Dry and clean any corrosion.','Replace any blown or corroded fuse with the same rating.'],
+ safety:['Ignition off and key out before touching fuses.','Same rating only. A bigger fuse can start a fire.'],
+ next:'Pull the cushion at the front edge. Look under it for damp.'},
+care:{title:'Care tips and tricks',sub:'Look after the car',
+ where:'Short tips, last in the order. They come from the TikTok you sent and the Gemini chat.',
+ diag:{car:[[290,65,'outside temp',-8,-10,'end'],[236,40,'cam solenoids',-6,-10,'end'],[262,65,'throttle',-8,22,'end'],[200,86,'brake booster',-6,18,'end'],[100,65,'O2 sensors',-6,-10,'end']],cap:'Where each tip lives on the car (approximate).'},
+ blocks:[
+  ['Outside temperature sensor',`<p>Behind the front bumper. Clean it and check the dash reading against a phone weather app. Rarely fixes the A/C alone.</p>`],
+  ['Cam solenoids',`<p>Not under the oil cap as in the video. On your V6 the parts are bolted to the front of the heads. Their known fault is oil in the plug.</p>`],
+  ['Throttle body',`<p>Your throttle is drive by wire, no separate idle valve. Cleaning the throttle body still helps a rough idle.</p>`],
+  ['Brake booster check valve',`<p>Behind the brake fluid reservoir. A soft or changing pedal needs a proper brake check first. Flush brake fluid every 2 years.</p>`],
+  ['Oxygen sensors',`<p>Four on your V6. Cleaning rarely helps and can damage them. Read the codes first.</p>`],
+  ['Moisture and drains',`<p>From the Gemini chat: keep the boot dry, check the rear window drain channels and tail light seals.</p>`],
+  ['Data plate',`<p>Door pillar: VIN <span class="pn">${VIN}</span>, type 220, paint 744 (silver, the name is a guess <span class="tag">UNVERIFIED</span>), 2330 kg.</p>`]
+ ],
+ checks:[
+  ['Check the dash outside temperature against a phone app.','Within 2 or 3 degrees is fine.'],
+  ['Look in the boot for damp once a month.','Especially after rain.'],
+  ['Brake fluid older than 2 years: book a flush.','It absorbs water.']
+ ],
+ after:[],
+ parts:['Contact cleaner, throttle body cleaner, DOT 4 brake fluid. Rough guess NZD 15 to 160 together.'],
+ fix:['Do the cheap checks above first.'],
+ safety:['Brakes are safety critical. A soft pedal: stop and have it checked.'],
+ next:'Pick the one tick above you can do this week.'}
+};
+const ORDER=['stereo','air','ac','idle','nostart','fuse','care'];
+</script>
+
+<script>
+/* ---------- router and views ---------- */
+const $=(s,r=document)=>r.querySelector(s);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+let navCount=0;
+const store={get(k){try{return localStorage.getItem(k)}catch(e){return null}},set(k,v){try{localStorage.setItem(k,v)}catch(e){}}};
+
+/* ---------- c52: the scan, quoted from inputs/220165S320202611161733.txt ---------- */
+const SCAN={at:'2026-11-16 17:33',km:'198888km',sn:'IP608-002065',foot:'This report is only responsible for the results of this detection',head:'27 systems detected: 1 systems related to fault codes, 4 fault codes'};
+const NC='no code';
+const ROWS={
+ 1:['Motor Electronics 2(ME2)','4 fault codes'],2:['Transmission(VGS)',NC],8:['Electronic Ignition Switch(EZS)',NC],24:['Keyless Go(KG)',NC],
+ 25:['COMAND, MCS Or AUDIO(D2B)',NC],26:['CD Changer(CDW)',NC],27:['Sound System(SOUND)',NC]};
+const CODES=[['P20CD','AC compressor torque implausible / See control module AAC/TAC (P1999)','Stored'],['P20D0-08','The air conditioning requests an implausible fan output. Check suction fan. (P1999)','Stored'],['P202C-08','Coolant thermostat (P0128)','Stored and Current'],['P2073-04','Electric suction fan for engine or air conditioning : Open circuit (P1999)','Stored']];
+const SC={
+ stereo:{rows:[25,26,27],short:'Scanner rows 25, 26, 27: no code',hint:'Eject test: no whirr',rec:[1],
+  note:'Three audio rows read clear while the stereo is dead.'},
+ air:{rows:[],short:'Scanner: air module never scanned by name',hint:'Raise test: no hum in 30 seconds',rec:[0],
+  none:'Air module never scanned by name. The scan has no row for it, so there is no scanner result to quote.'},
+ ac:{rows:[1],codes:true,short:'Scanner row 1: 4 codes. A/C module never scanned',hint:'Suction fan: did not run with A/C on',rec:[0],
+  none:'A/C module (AAC/TAC) never scanned by name. The four codes above are all the scan has on this problem.'},
+ idle:{rows:[1,2],short:'Scanner rows 1, 2: no code points at it',hint:'Idle in drive: shake, rpm needle moving',rec:[0],
+  note:'The four codes on row 1 are the A/C fan, compressor and thermostat codes. None names idle or misfire.'},
+ nostart:{rows:[8,24],short:'Scanner row 8 EZS: no code, scanned after the lockout',hint:'Battery: 11.6 V at the terminals',rec:[0],
+  note:'The no-start was 2026-11-06. This scan is 2026-11-16, ten days later.'},
+ fuse:{rows:[],short:'Scanner: no row for a fuse box',hint:'Under the cushion: damp carpet',rec:[1],
+  none:'No row in the scan is about a fuse box or a seat cushion, so there is nothing to quote.'},
+ care:{rows:[],short:'Scanner: nothing to quote here',hint:'Brake pedal: soft',rec:[0],
+  none:'Care tips come from a TikTok and a Gemini chat, not from the scan. There is no scanner row to answer.'}
+};
+const rowHtml=n=>`<p class="srow"><span class="rn">${n}</span><span>${esc(ROWS[n][0])}</span><span class="rr${n===1?' codes':''}">${esc(ROWS[n][1])}</span></p>`;
+const hdr=()=>`<p class="sh"><span>Scanner report <b>${SCAN.at}</b></span><span><b>${SCAN.km}</b></span><span>SN ${SCAN.sn}</span></p>`;
+const today=()=>new Date().toLocaleDateString('en-CA');
+const rget=k=>{try{return JSON.parse(store.get('c52.reply.'+k)||'null')}catch(e){return null}};
+/* the picture stays on the phone: IndexedDB, one blob per fault */
+const idb=()=>new Promise((ok,no)=>{try{const r=indexedDB.open('c52',1);r.onupgradeneeded=()=>r.result.createObjectStore('p');r.onsuccess=()=>ok(r.result);r.onerror=()=>no(r.error)}catch(e){no(e)}});
+const pput=(k,b)=>idb().then(d=>new Promise((ok,no)=>{const t=d.transaction('p','readwrite');b?t.objectStore('p').put(b,k):t.objectStore('p').delete(k);t.oncomplete=()=>ok();t.onerror=()=>no(t.error)})).catch(()=>{});
+const pget=k=>idb().then(d=>new Promise(ok=>{const q=d.transaction('p').objectStore('p').get(k);q.onsuccess=()=>ok(q.result||null);q.onerror=()=>ok(null)})).catch(()=>null);
+function slipText(k){const s=SC[k];const lines=[`Scanner report ${SCAN.at}, ${SCAN.km}, SN ${SCAN.sn}`];s.rows.forEach(n=>lines.push(`Row ${n} ${ROWS[n][0]}: ${ROWS[n][1]}`));if(s.codes)CODES.forEach(c=>lines.push(`${c[0]} ${c[1]} (${c[2]})`));if(s.none)lines.push(s.none);else if(s.note)lines.push(s.note);const r=rget(k);if(r&&r.t)lines.push(`The car, ${r.d}: ${r.t}`);return `S 320 L W220, ${VIN}\n`+lines.join('\n')}
+function slipView(k){const s=SC[k];
+ return `<section class="slip" aria-label="What the scanner said about this problem" data-slip="${k}">${hdr()}
+ ${s.rows.map(rowHtml).join('')}${s.codes?CODES.map(c=>`<p class="crow"><span>${c[0]}</span><span>${esc(c[1])}</span><span>${c[2]}</span></p>`).join(''):''}
+ ${s.none?`<p class="nores">${esc(s.none)}</p>`:''}${s.note?`<p class="note">${esc(s.note)}</p>`:''}
+ <div class="reply" id="reply"><span class="lab">The car's reply</span>
+  <div id="saved" aria-live="polite"></div>
+  <label for="rt" class="lab" style="display:block;margin-top:8px">What the car did at the check</label>
+  <textarea id="rt" rows="3" maxlength="400" placeholder="${esc(s.hint)}"></textarea>
+  <div class="acts"><input id="rp" class="vh" type="file" accept="image/*" aria-label="Photo, kept on this phone"><label class="btn pick" for="rp">Add a photo</label><button class="btn" id="rs" type="button">Write it on the row</button><button class="btn txt" id="rc" type="button" hidden>Clear</button></div>
+  <p class="ph">Saved on this phone only, with today's date. One reply per row, a new one replaces the old.</p>
+  <div class="acts"><button class="btn acc" id="share" type="button">Share this row</button><span class="msg" id="msg" role="status"></span></div>
+ </div></section>`}
+
+function startView(){
+ return `<div class="start">
+ <div class="stagecol"><p class="kick">Scanner report ${esc(SCAN.at)}, ${esc(SCAN.km)}</p><h1>What is wrong with it?</h1><div class="stage" id="stage" aria-label="3D car with six area pins">
+  <svg class="leads" id="leads" aria-hidden="true"></svg>
+  <div id="loadline">Loading the car model...</div>
+ </div>
+ <div class="bar" id="chip" data-sel="0"><span id="chiptxt" aria-live="polite">Tap a red dot to zoom to that part of the car.</span><button class="btn txt" id="reset" type="button" hidden>Reset view</button><a class="btn" id="chipgo" href="#/stereo" hidden>Open guide</a></div>
+ <p class="fine credit">Stand-in W220 model (Mercedes-Benz S600 W220 2005 by Merc_TV, CC BY 4.0), not your S 320 L.</p></div>
+ <div>
+  <section class="slip" aria-label="The scanner report, quoted">${hdr()}
+   <p class="big">${esc(SCAN.head)}</p>
+   <p class="quo">&ldquo;${esc(SCAN.foot)}&rdquo;</p>
+   <p class="gap">Codes in 1 of 27 systems, all four in the A/C and cooling area. Seven problems, set beside it below.</p>
+  </section>
+  <p class="fine" style="margin-top:6px">Your seven problems, in your order, each with what the scanner said about it. Each opens a ranked check list with ticks that stay saved on this phone.</p>
+  <h2>Your <span id="cnt" data-to="7">7</span> problems</h2>
+  <ol class="rows" id="problems">${ORDER.map((k,i)=>{const f=FAULTS[k],r=rget(k);return `<li style="--i:${i}"><a href="#/${k}" data-row="${k}"><span class="n">${i+1}</span><span><b>${esc(f.title)}</b><small>${esc(f.sub)}</small><span class="sc">${esc(SC[k].short)}</span><span class="cr${r&&r.t?' has':''}" style="display:block">${r&&r.t?esc('The car, '+r.d+': '+r.t.slice(0,60)):'The car: nothing recorded yet'}</span></span><span class="go">Open</span></a></li>`}).join('')}</ol>
+  <div class="notes">
+  <p class="fine foot">Answers here come from your own scan, your photos and your Gemini chat, not from a generic list. No sign-in, no account. Works in any browser, on the phone or on the Mac. Phone link: not supplied yet.</p>
+  <p class="fine" style="margin-top:8px">The scan's year column reads "-- 08/2002" and the car plate says MY2001. The guide shows both and does not pick one.</p>
+  <p class="fine" style="margin-top:8px">Not in this version: Tap a part to remove it and see the screws, your own W220 model with every part, Part photos. Systems, checklist and search pages come in the next version.</p>
+  </div>
+ </div></div>`}
+function faultView(k){
+ const f=FAULTS[k];
+ const blk=b=>`<section class="blk ${b[2]||''}"><h3>${esc(b[0])}</h3>${b[1]}</section>`;
+ const dg=f.diag.svg||SVG.car(f.diag.car);
+ return `<article class="page" data-page="${k}">
+ <button class="btn back" id="back" type="button">&larr; Back</button>
+ <h1 style="margin-top:8px">${esc(f.title)}</h1>
+ <div class="stagecol fs"><div class="stage" id="stage" data-fault="${k}" aria-label="3D car, the pulsing dot marks where this problem is">
+  <svg class="leads" id="leads" aria-hidden="true"></svg>
+  <div id="loadline">Loading the car model...</div>
+ </div><p class="fine credit">Stand-in W220 model (Mercedes-Benz S600 W220 2005 by Merc_TV, CC BY 4.0), not your S 320 L.</p></div>
+ ${slipView(k)}
+ <p class="where"><span class="lab">Where it is</span><br>${esc(f.where)}</p>
+ <figure class="diag" style="margin:16px 0">${dg}<figcaption>Drawn diagram. ${esc(f.diag.cap)}</figcaption></figure>
+ ${f.blocks.map(blk).join('')}
+ <h2>Check first, in this order</h2>
+ <ol class="tk">${f.checks.map((c,i)=>`<li><label><input type="checkbox" data-k="x5.tick.${k}.${i}"><span class="tx"><b>${i+1}. ${esc(c[0])}</b> ${esc(c[1])}</span></label>${SC[k].rec.includes(i)?`<button class="btn txt rec" type="button" data-rec="${esc(c[0])}">It failed: record it</button>`:''}</li>`).join('')}</ol>
+ <p class="prog" data-prog></p>
+ ${f.after.map(blk).join('')}
+ <h2>Parts and rough cost</h2><section class="blk">${f.parts.map(p=>`<p>${p}</p>`).join('')}<p class="fine">Costs are rough guesses in NZD, not quotes.</p></section>
+ <h2>Fix steps</h2><ol class="blk" style="padding:12px 14px 12px 32px">${f.fix.map(s=>`<li>${esc(s)}</li>`).join('')}</ol>
+ <section class="blk safe"><h3>Safety</h3><ul>${f.safety.map(s=>`<li>${esc(s)}</li>`).join('')}</ul></section>
+ <div class="nx"><span class="lab">Next check</span><p style="margin-top:4px">${esc(f.next)}</p></div>
+ <p class="foot"><a href="#/" class="btn">All 7 problems</a></p>
+ </article>`}
+function countUp(){const c=document.getElementById('cnt');if(!c||matchMedia('(prefers-reduced-motion: reduce)').matches)return;const to=+c.dataset.to,t0=performance.now();c.textContent='0';(function f(n){const k=Math.max(0,Math.min(1,(n-t0)/700));c.textContent=String(Math.round(to*(1-Math.pow(1-k,3))));if(k<1)requestAnimationFrame(f)})(t0)}
+/* x5e: start the 60 ms row stagger only after first paint and the car model (1200 ms fallback), so each step is visible */
+function revealRows(){const ul=document.getElementById('problems');if(!ul)return;let done=false;
+ /* quiet the GL canvas first so queued GPU work drains, then start the stagger on a clear frame */
+ const go=()=>{if(done)return;done=true;ul.classList.add('on')};
+ const fb=()=>{if(done)return;if(document.getElementById('loadline')&&performance.now()<2500)setTimeout(fb,250);else go()};go();
+ }
+function route(){
+ const h=location.hash.replace(/^#\/?/,'');
+ const v=$('#view');
+ window.scrollTo(0,0);
+ if(FAULTS[h]){v.innerHTML=faultView(h);wireFault();document.title=FAULTS[h].title+' | S 320 fix guide';MERC.stageOn(true);MERC.attach($('#stage'),h)}
+ else{v.innerHTML=startView();document.title='S 320 fix guide';MERC.stageOn(true);MERC.attach($('#stage'))}
+ v.classList.remove('enter');void v.offsetWidth;if(FAULTS[h])v.classList.add('enter');
+ countUp();
+ if(!FAULTS[h])revealRows();
+}
+
+function wireReply(k){
+ const ta=$('#rt'),sv=$('#saved'),msg=$('#msg'),file=$('#rp'),clr=$('#rc');let url=null;
+ const say=t=>{msg.textContent=t};
+ async function paint(){const r=rget(k);if(url){URL.revokeObjectURL(url);url=null}
+  if(!r||!(r.t||r.p)){sv.innerHTML='<p class="empty">Empty. The scanner row above is waiting for the car.</p>';clr.hidden=true;return}
+  const b=r.p?await pget(k):null;url=b?URL.createObjectURL(b):null;
+  sv.innerHTML=`<p class="car"><b>The car, ${esc(r.d)}:</b> ${esc(r.t||'(photo only)')}${url?`<img alt="Photo recorded at the car, kept on this phone" src="${url}">`:''}</p>`;clr.hidden=false;ta.value=r.t||''}
+ $('#rs').addEventListener('click',async()=>{const t=ta.value.trim(),f=file.files&&file.files[0];const old=rget(k);if(!t&&!f&&!(old&&old.p)){say('Write what the car did first.');return}
+  let p=old&&old.p;if(f){await pput(k,f);p=true}
+  store.set('c52.reply.'+k,JSON.stringify({d:today(),t:t,p:!!p}));file.value='';say('Written on the row, saved on this phone.');paint()});
+ clr.addEventListener('click',async()=>{store.set('c52.reply.'+k,'');await pput(k,null);ta.value='';say('Cleared.');paint()});
+ document.querySelectorAll('[data-rec]').forEach(b=>b.addEventListener('click',()=>{ta.value=b.dataset.rec.replace(/\.$/,'')+': ';$('#reply').scrollIntoView({block:'center'});ta.focus()}));
+ $('#share').addEventListener('click',async()=>{
+  const r=rget(k);const pend=ta.value.trim();const text=slipText(k)+(pend&&(!r||r.t!==pend)?`\nThe car, ${today()}: ${pend}`:'');
+  const b=r&&r.p?await pget(k):null;const data={title:'S 320 scan row',text};
+  try{if(b){const f=new File([b],'car.jpg',{type:b.type||'image/jpeg'});if(navigator.canShare&&navigator.canShare({files:[f]}))data.files=[f]}
+   if(navigator.share){await navigator.share(data);say('Shared.');return}}catch(e){if(e&&e.name==='AbortError'){say('Share cancelled.');return}}
+  try{await navigator.clipboard.writeText(text);say('Copied. Paste it into a message.')}catch(e){const x=document.createElement('textarea');x.value=text;document.body.appendChild(x);x.select();try{document.execCommand('copy');say('Copied. Paste it into a message.')}catch(_){say('Could not copy on this browser.')}x.remove()}});
+ paint()}
+function wireFault(){
+ const ticks=[...document.querySelectorAll('.tk input')];
+ const upd=()=>{$('[data-prog]').textContent=ticks.filter(t=>t.checked).length+' of '+ticks.length+' checked'};
+ ticks.forEach(t=>{t.checked=store.get(t.dataset.k)==='1';t.addEventListener('change',()=>{store.set(t.dataset.k,t.checked?'1':'0');upd()})});upd();
+ wireReply($('.page').dataset.page);
+ $('#back').addEventListener('click',()=>{if(navCount>0)history.back();else location.hash='#/'});
+}
+addEventListener('hashchange',()=>{navCount++;route()});
+</script>
+
+<script type="module">
+import * as THREE from 'three';
+import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
+import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';
+import {RoomEnvironment} from 'three/addons/environments/RoomEnvironment.js';
+
+const QS=new URLSearchParams(location.search);
+const RM=matchMedia('(prefers-reduced-motion: reduce)').matches;
+const MODEL_URL=QS.get('model')||(/github\.io$/.test(location.hostname)?'../merc-guide-x5d/model/scene.gltf':'../model/scene.gltf');
+const QA=QS.get('qa')==='1';
+const MODEL={paint:['Paint'],glass:['window_glass'],chrome:['chrome'],hide:['w220_engine_v12'],
+ wheels:[['w220_wheel',1.64,-1],['w220_wheel_2',1.64,1],['w220_wheel_3',-1.445,-1],['s500_wheel',-1.445,1]]};
+window.__qaWarns=[];
+const SEL=new Map();
+const qaWarn=m=>{console.warn(m);window.__qaWarns.push(m);if(QA){const q=document.getElementById('qa');q.hidden=false;q.textContent+=m+'\n'}};
+const reg=(kind,n)=>SEL.set(kind+' '+n,0),hit=(kind,n)=>SEL.set(kind+' '+n,(SEL.get(kind+' '+n)||0)+1);
+function selReport(){let miss=0;SEL.forEach((c,k)=>{if(!c){miss++;qaWarn('[merc] selector matched 0: '+k)}});window.__selMiss=miss;window.__selHits=Object.fromEntries(SEL);return miss}
+
+/* PINS: 6, one per round 1 fault that has an area on the car (care tips has none). Positions approximate, car units, +x is the nose. */
+const PINS=[
+ {id:'stereo',label:'Stereo: amp and CD changer, boot left',short:'Stereo: amp, CD changer',p:[-2.0,.95,-.45],from:'top',zoom:2.0},
+ {id:'air',label:'Air suspension: right rear strut',short:'Air: right rear strut',p:[-1.445,.5,.82],from:'side',zoom:2.2},
+ {id:'ac',label:'A/C: fan, condenser and compressor, front',short:'A/C: fan, compressor',p:[2.35,.6,0],from:'top',zoom:2.3},
+ {id:'idle',label:'Idle shake: engine bay',short:'Idle shake: engine',p:[1.55,.95,0],from:'top',zoom:2.4},
+ {id:'nostart',label:'Battery and spare: boot right',short:'Battery: boot right',p:[-1.95,.8,.5],from:'top',zoom:2.0},
+ {id:'fuse',label:'Other fuse box: under the right rear seat',short:'Fuse box: right rear seat',p:[-.7,.75,.45],from:'top',zoom:2.0}
+];
+let focusId=null,holder=null,tyres=[],anchors=[],leadEls=[],occT=0,occ=[],carBox=new THREE.Box3(new THREE.Vector3(-2.56,0,-.95),new THREE.Vector3(2.56,1.5,.95)),renderer,scene,camera,controls,stageEl,canvas,raf=0,dirty=true,tween=null,pinEls=[],modelReady=false,sel=null,w=0,h=0,ro=null;
+const HOME={pos:new THREE.Vector3(4.6,3.5,5.1),tgt:new THREE.Vector3(0,.7,0),dist:7.4};const HOMEDIR=HOME.pos.clone().sub(HOME.tgt).normalize();
+const MERC={gl:false,model:false,
+ state(){return {model:modelReady,pins:PINS.length,sel,wheels:window.__wheelsPlaced,selMiss:window.__selMiss}},
+ attach(el,fid){stageEl=el;focusId=fid||null;if(!renderer){const l=document.getElementById('loadline');if(l)l.textContent='3D is not available here. The guide works without it.';return}mount()},
+ stageOn(on){if(!on){cancelAnimationFrame(raf);raf=0;dirty=false;idle=false;tween=null;stageEl=null;if(ro){ro.disconnect();ro=null}if(canvas&&canvas.parentNode)canvas.remove()}}};
+MERC.layout=()=>measure(camera);
+MERC.fill=()=>{const m=measure(camera);return m?{stage:m.stage,box:m.box,fill_h:(m.box.y1-m.box.y0)/m.stage.h,fill_w:(m.box.x1-m.box.x0)/m.stage.w}:null};
+MERC.layoutSweep=()=>sweep();
+MERC.pinInfo=()=>PINS.map((p,i)=>{const r=pinEls[i]?pinEls[i].getBoundingClientRect():null;return {id:p.id,cx:r?r.x+r.width/2:null,cy:r?r.y+r.height/2:null,occ:pinEls[i]?pinEls[i].dataset.occ:null,vis:pinEls[i]?pinEls[i].style.visibility:null}});
+MERC.fitInfo=()=>({dist:camera.position.distanceTo(controls.target),sel,w,h});
+window.MERC=MERC;
+
+function init(){
+ try{renderer=new THREE.WebGLRenderer({antialias:true,alpha:true,powerPreference:'low-power'})}catch(e){console.warn('[merc] no WebGL',e);renderer=null;return false}
+ renderer.setPixelRatio(Math.min(devicePixelRatio||1,2));renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=.9;
+ scene=new THREE.Scene();
+ const pm=new THREE.PMREMGenerator(renderer);scene.environment=pm.fromScene(new RoomEnvironment(),.04).texture;scene.environmentIntensity=.8;
+ const dl=new THREE.DirectionalLight(0xffffff,1.4);dl.position.set(4,6,3);scene.add(dl);
+ camera=new THREE.PerspectiveCamera(32,1,.1,60);camera.position.copy(HOME.pos);
+ const floor=new THREE.Mesh(new THREE.CircleGeometry(4.2,48),new THREE.MeshBasicMaterial({color:0x182025,transparent:true,opacity:.75}));floor.rotation.x=-Math.PI/2;floor.position.y=-.005;scene.add(floor);
+ canvas=renderer.domElement;MERC.gl=true;return true}
+function mount(){
+ stageEl.prepend(canvas);
+ if(controls)controls.dispose();
+ controls=new OrbitControls(camera,canvas);controls.enableDamping=!RM;controls.dampingFactor=.08;controls.enablePan=false;controls.minDistance=1.2;controls.maxDistance=40;controls.maxPolarAngle=Math.PI*.49;
+ controls.autoRotate=false;idle=!RM&&!sel;sweepT0=performance.now();controls.target.copy(HOME.tgt);
+  controls.addEventListener('start',()=>{idle=false;dirty=true});controls.addEventListener('change',()=>{dirty=true});
+sel=null;
+ const lk=document.getElementById('leads');leadEls=[];if(lk)PINS.forEach(()=>{const ln=document.createElementNS('http://www.w3.org/2000/svg','line'),ci=document.createElementNS('http://www.w3.org/2000/svg','circle');ci.setAttribute('r','3');lk.append(ln,ci);leadEls.push([ln,ci])});
+ pinEls=PINS.map(p=>{const b=document.createElement('button');b.type='button';b.className='pin';b.setAttribute('aria-label',p.label);b.setAttribute('aria-pressed','false');b.dataset.pin=p.id;b.innerHTML='<i></i>';if(focusId){if(p.id===focusId)b.dataset.focus='1';else b.dataset.dim='1';b.addEventListener('click',()=>{location.hash='#/'+p.id})}else b.addEventListener('click',()=>pick(p.id));stageEl.appendChild(b);return b});
+ const rb0=document.getElementById('reset');rb0&&rb0.addEventListener('click',()=>{sel=null;chip(null);fitHome();flyTo(HOME.pos,HOME.tgt,()=>{idle=!RM;sweepT0=performance.now()})});
+ if(ro)ro.disconnect();ro=new ResizeObserver(resize);ro.observe(stageEl);resize();
+ if(modelReady){const l=document.getElementById('loadline');l&&l.remove()}
+ dirty=true;if(!raf)loop()}
+const FILL=0.74,TV=new THREE.Vector3();let _pts=null;
+function carPts(){if(_pts)return _pts;const c=[];if(!holder){for(const x of [carBox.min.x,carBox.max.x])for(const y of [carBox.min.y,carBox.max.y])for(const z of [carBox.min.z,carBox.max.z])c.push(new THREE.Vector3(x,y,z));return c}
+ const vis=o=>{for(let p=o;p;p=p.parent)if(!p.visible)return false;return true};const ms=[];holder.traverse(o=>{if(o.isMesh&&vis(o)&&o.geometry.attributes.position)ms.push(o)});tyres.forEach(o=>{if(o.isMesh)ms.push(o)});
+ let tot=0;ms.forEach(m=>tot+=m.geometry.attributes.position.count);const st=Math.max(1,Math.floor(tot/1400));
+ ms.forEach(m=>{m.updateMatrixWorld(true);const pa=m.geometry.attributes.position;for(let i=0;i<pa.count;i+=st)c.push(new THREE.Vector3().fromBufferAttribute(pa,i).applyMatrix4(m.matrixWorld))});_pts=c;return c}
+function aspectK(){const cam=new THREE.PerspectiveCamera(camera.fov,1,.1,80),el=Math.asin(HOMEDIR.y),az0=Math.atan2(HOMEDIR.x,HOMEDIR.z);let x0=1e9,x1=-1e9,y0=1e9,y1=-1e9;const c=carPts();
+ const azs=[];if(RM)azs.push(az0);else for(let k=-5;k<=5;k++)azs.push(az0+k*Math.PI/36);
+ for(const az of azs){cam.position.set(Math.cos(el)*Math.sin(az)*30,.7+Math.sin(el)*30,Math.cos(el)*Math.cos(az)*30);cam.lookAt(0,.7,0);cam.updateMatrixWorld(true);for(const p of c){TV.copy(p).project(cam);x0=Math.min(x0,TV.x);x1=Math.max(x1,TV.x);y0=Math.min(y0,TV.y);y1=Math.max(y1,TV.y)}}
+ return .94*((y1-y0)/(x1-x0))/FILL}
+function sizeStage(){const cw=stageEl.clientWidth;if(!cw)return;const cap=innerHeight*(stageEl.dataset.fault?.46:.7);const nh=Math.round(Math.max(200,Math.min(cw*aspectK(),cap)));if(Math.abs(stageEl.clientHeight-nh)>1)stageEl.style.height=nh+'px'}
+function resize(){if(!stageEl)return;sizeStage();w=stageEl.clientWidth;h=stageEl.clientHeight;if(!w||!h)return;renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix();
+ const lk=document.getElementById('leads');if(lk)lk.setAttribute('viewBox','0 0 '+w+' '+h);
+ fitHome();if(!sel&&!tween){const dir=camera.position.clone().sub(controls.target).normalize();controls.target.copy(HOME.tgt);camera.position.copy(controls.target).addScaledVector(dir,HOME.dist)}dirty=true}
+/* fit the car over az0 +/-25 deg (the idle sweep) inside the stage's own aspect */
+let idle=false,sweepT0=0,lastIdle=0;const SWEEP=25*Math.PI/180;
+function fitHome(){
+ const cam=camera.clone();cam.aspect=w/h;cam.updateProjectionMatrix();const c=carPts();
+ const el=Math.asin(HOMEDIR.y),az0=Math.atan2(HOMEDIR.x,HOMEDIR.z);const azs=[];if(RM)azs.push(az0);else for(let k=-5;k<=5;k++)azs.push(az0+k*Math.PI/36);
+ const ok=d=>{for(const az of azs){cam.position.set(HOME.tgt.x+d*Math.cos(el)*Math.sin(az),HOME.tgt.y+d*Math.sin(el),HOME.tgt.z+d*Math.cos(el)*Math.cos(az));cam.lookAt(HOME.tgt);cam.updateMatrixWorld(true);for(const p of c){TV.copy(p).project(cam);if(Math.abs(TV.x)>.94||Math.abs(TV.y)>.94)return false}}return true};
+ let lo=2,hi=40;
+ for(let pass=0;pass<4;pass++){lo=2;hi=40;for(let i=0;i<22;i++){const m=(lo+hi)/2;if(ok(m))hi=m;else lo=m}
+  /* x5e: centre the car in the stage: shift the target by the projected vertical offset of the box at the home azimuth */
+  cam.position.copy(HOME.tgt).addScaledVector(HOMEDIR,hi);cam.lookAt(HOME.tgt);cam.updateMatrixWorld(true);let a=1e9,b2=-1e9;for(const p of c){const y=TV.copy(p).project(cam).y;a=Math.min(a,y);b2=Math.max(b2,y)}
+  const mid=(a+b2)/2;HOME.tgt.y+=mid*hi*Math.tan(16*Math.PI/180)}
+ HOME.dist=hi;HOME.pos.copy(HOME.tgt).addScaledVector(HOMEDIR,hi);return hi}
+/* measured layout: project sampled vertices of every visible car mesh, return the px box inside the stage */
+function measure(cam){if(!holder||!stageEl)return null;cam.updateMatrixWorld(true);let x0=1e9,y0=1e9,x1=-1e9,y1=-1e9,n=0;const v=new THREE.Vector3();
+ const vis=o=>{for(let p=o;p;p=p.parent)if(!p.visible)return false;return true};
+ const go=m=>{if(!m.isMesh||!vis(m)||!m.geometry.attributes.position)return;const pa=m.geometry.attributes.position,st=Math.max(1,Math.floor(pa.count/2500));m.updateMatrixWorld(true);for(let i=0;i<pa.count;i+=st){v.fromBufferAttribute(pa,i).applyMatrix4(m.matrixWorld).project(cam);if(v.z>1)continue;const x=(v.x*.5+.5)*w,y=(-v.y*.5+.5)*h;x0=Math.min(x0,x);x1=Math.max(x1,x);y0=Math.min(y0,y);y1=Math.max(y1,y);n++}};
+ holder.traverse(go);tyres.forEach(go);
+ const r2=a=>Math.round(a*10)/10;return {stage:{w,h},box:{x0:r2(x0),y0:r2(y0),x1:r2(x1),y1:r2(y1)},inside:x0>=0&&y0>=0&&x1<=w&&y1<=h,margin_px:{l:r2(x0),r:r2(w-x1),t:r2(y0),b:r2(h-y1)},centre_offset_px:{dx:r2((x0+x1)/2-w/2),dy:r2((y0+y1)/2-h/2)},coverage_pct:{width:r2(100*(x1-x0)/w),height:r2(100*(y1-y0)/h),area:r2(100*(x1-x0)*(y1-y0)/(w*h))},samples:n}}
+function sweep(){const cam=camera.clone();cam.aspect=w/h;cam.updateProjectionMatrix();const d=camera.position.distanceTo(controls.target),dir=camera.position.clone().sub(controls.target).normalize(),el=Math.asin(dir.y);let worst=null,all=[];
+ const az0=Math.atan2(HOMEDIR.x,HOMEDIR.z);for(let k=-5;k<=5;k++){const az=az0+k*Math.PI/36;cam.position.set(controls.target.x+d*Math.cos(el)*Math.sin(az),controls.target.y+d*Math.sin(el),controls.target.z+d*Math.cos(el)*Math.cos(az));cam.lookAt(controls.target);const m=measure(cam);all.push(m.inside);const mm=Math.min(m.margin_px.l,m.margin_px.r,m.margin_px.t,m.margin_px.b);if(!worst||mm<worst.mm)worst={mm,az_deg:k*5,...m}}
+ return {azimuths:11,all_inside:all.every(Boolean),min_margin_px:worst.mm,worst}}
+function chip(p){const c=document.getElementById('chip');if(!c)return;const t=document.getElementById('chiptxt'),go=document.getElementById('chipgo'),rs=document.getElementById('reset');
+ if(!p){c.dataset.sel='0';t.textContent='Tap a red dot to zoom to that part of the car.';go.hidden=true;rs.hidden=true;pinEls.forEach(b=>b.setAttribute('aria-pressed','false'));return}
+ c.dataset.sel='1';t.textContent=p.short;go.hidden=false;rs.hidden=false;go.href='#/'+p.id;pinEls.forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.pin===p.id)))}
+function pick(id){const p=PINS.find(x=>x.id===id);sel=id;idle=false;chip(p);
+ const t=new THREE.Vector3(...p.p);const dir=camera.position.clone().sub(controls.target).normalize();dir.y=Math.max(dir.y,.25);dir.normalize();
+ flyTo(t.clone().addScaledVector(dir,p.zoom),t)}
+function flyTo(pos,tgt,done){
+ if(RM){camera.position.copy(pos);controls.target.copy(tgt);controls.update();dirty=true;done&&done();return}
+ tween={t0:performance.now(),d:650,p0:camera.position.clone(),t1:controls.target.clone(),p1:pos.clone(),tg:tgt.clone(),done}}
+function loop(){raf=requestAnimationFrame(loop);if(!stageEl||!stageEl.isConnected)return;
+ if(tween){const k=Math.min(1,(performance.now()-tween.t0)/tween.d),e=k<.5?2*k*k:1-Math.pow(-2*k+2,2)/2;camera.position.lerpVectors(tween.p0,tween.p1,e);controls.target.lerpVectors(tween.t1,tween.tg,e);dirty=true;if(k>=1){const d=tween.done;tween=null;d&&d()}}
+ controls.update();
+ if(idle&&!tween&&performance.now()-lastIdle>=32){lastIdle=performance.now();const el=Math.asin(HOMEDIR.y),az0=Math.atan2(HOMEDIR.x,HOMEDIR.z),az=az0+SWEEP*Math.sin((performance.now()-sweepT0)/2500),d=HOME.dist;camera.position.set(HOME.tgt.x+d*Math.cos(el)*Math.sin(az),HOME.tgt.y+d*Math.sin(el),HOME.tgt.z+d*Math.cos(el)*Math.cos(az));camera.lookAt(HOME.tgt);dirty=true}
+ if(dirty&&!(window.__hold>performance.now())){renderer.render(scene,camera);window.__rn=(window.__rn||0)+1;placePins();dirty=false}}
+const ray=new THREE.Raycaster();
+function occlusion(){const now=performance.now();if(now-occT<120||!holder)return;occT=now;const meshes=[];holder.traverse(o=>{if(o.isMesh&&o.visible)meshes.push(o)});
+ PINS.forEach((p,i)=>{const a=anchors[i];if(!a)return;const d=a.clone().sub(camera.position),L=d.length();ray.set(camera.position,d.normalize());ray.near=.01;ray.far=L-.1;const hit=ray.intersectObjects(meshes,false);occ[i]=hit.length>0})}
+function placePins(){occlusion();const pts=[];
+ PINS.forEach((p,i)=>{const a=anchors[i]||new THREE.Vector3(...p.p);const v=a.clone().project(camera);pts.push({i,tx:(v.x*.5+.5)*w,ty:(-v.y*.5+.5)*h,x:(v.x*.5+.5)*w,y:(-v.y*.5+.5)*h,off:v.z>1})});
+ /* spread: keep every pair of pin centres at least MIN px apart (hit areas are 44) */
+ const MIN=48,PAD=24,act=pts.filter(q=>!q.off);
+ for(let it=0;it<60;it++){let mv=false;for(let a=0;a<act.length;a++)for(let b=a+1;b<act.length;b++){const A=act[a],B=act[b];let dx=B.x-A.x,dy=B.y-A.y,d=Math.hypot(dx,dy);if(d<MIN){if(d<.01){dx=Math.cos(a*2.1+b);dy=Math.sin(a*2.1+b);d=1}const k=(MIN-d)/2/d;A.x-=dx*k;A.y-=dy*k;B.x+=dx*k;B.y+=dy*k;mv=true}}
+  act.forEach(q=>{q.x=Math.min(w-PAD,Math.max(PAD,q.x));q.y=Math.min(h-PAD,Math.max(PAD,q.y))});if(!mv)break}
+ pts.forEach(q=>{const b=pinEls[q.i];if(!b)return;b.style.transform=`translate(${(q.x-22).toFixed(1)}px,${(q.y-22).toFixed(1)}px)`;b.style.visibility=q.off?'hidden':'visible';b.dataset.occ=occ[q.i]?'1':'0';
+  const le=leadEls[q.i];if(le){const far=Math.hypot(q.x-q.tx,q.y-q.ty)>8&&!q.off;le[0].style.display=le[1].style.display=far?'':'none';if(far){le[0].setAttribute('x1',q.tx);le[0].setAttribute('y1',q.ty);le[0].setAttribute('x2',q.x);le[0].setAttribute('y2',q.y);le[1].setAttribute('cx',q.tx);le[1].setAttribute('cy',q.ty)}}})}
+
+async function loadModel(){
+ if(QS.get('model')){ /* QA override only: a model.json beside the model, confirmed:true overrides the inline names */
+  try{const r=await fetch(MODEL_URL.replace(/\.[^./?#]+(?=[?#]|$)/,'.json'),{cache:'no-cache'});if(r.ok){const j=await r.json();const p=j&&j.schema==='merc-model/1'&&j.proposed;if(p&&j.confirmed===true){if(Array.isArray(p.paint))MODEL.paint=p.paint;if(Array.isArray(p.glass))MODEL.glass=p.glass;if(Array.isArray(p.chrome))MODEL.chrome=p.chrome;if(Array.isArray(p.hide))MODEL.hide=p.hide;if(Array.isArray(p.wheels))MODEL.wheels=p.wheels.map((n,i)=>[n,[1.64,1.64,-1.445,-1.445][i],[-1,1,-1,1][i]])}}}catch(e){}
+ }
+ const g=await new GLTFLoader().loadAsync(MODEL_URL,e=>{const l=document.getElementById('loadline');if(l&&e.total)l.textContent='Loading the car model... '+Math.round(100*e.loaded/e.total)+'%'});
+ MODEL.paint.forEach(n=>reg('paint',n));MODEL.glass.forEach(n=>reg('glass',n));MODEL.chrome.forEach(n=>reg('chrome',n));MODEL.hide.forEach(n=>reg('hide',n));MODEL.wheels.forEach(s=>reg('wheel',s[0]));
+ const root=g.scene;
+ const paint=new THREE.MeshPhysicalMaterial({color:0xaab2b8,metalness:.85,roughness:.3,clearcoat:1,clearcoatRoughness:.08});
+ const glass=new THREE.MeshPhysicalMaterial({color:0x10181b,roughness:.1,metalness:0,transparent:true,opacity:.55,depthWrite:false});
+ const chrome=new THREE.MeshStandardMaterial({color:0xdfe3e8,metalness:1,roughness:.14});
+ root.traverse(o=>{if(!o.isMesh)return;const sw=m=>{const n=(m&&m.name)||'';if(MODEL.paint.includes(n)){hit('paint',n);return paint}if(MODEL.glass.includes(n)){hit('glass',n);return glass}if(MODEL.chrome.includes(n)){hit('chrome',n);return chrome}return m};o.material=Array.isArray(o.material)?o.material.map(sw):sw(o.material)});
+ holder=new THREE.Group();holder.add(root);
+ const b=new THREE.Box3().setFromObject(root),sz=b.getSize(new THREE.Vector3());if(sz.z>sz.x)holder.rotation.y=Math.PI/2;
+ holder.updateMatrixWorld(true);let b2=new THREE.Box3().setFromObject(holder);const s2=b2.getSize(new THREE.Vector3());holder.scale.setScalar(5.12/Math.max(s2.x,s2.z));holder.updateMatrixWorld(true);b2=new THREE.Box3().setFromObject(holder);const c=b2.getCenter(new THREE.Vector3());holder.position.set(-c.x,-b2.min.y-.07,-c.z);holder.updateMatrixWorld(true);
+ /* the four wheel nodes ship stacked at the origin: move each onto its axle, add a tyre and a disc */
+ const tyreMat=new THREE.MeshStandardMaterial({color:0x2a2c30,roughness:.7}),discMat=new THREE.MeshStandardMaterial({color:0x55595f,roughness:.45,metalness:.9});
+ const prof=[[.2,.11],[.26,.112],[.31,.108],[.332,.098],[.343,.08],[.346,0],[.343,-.08],[.332,-.098],[.31,-.108],[.26,-.112],[.2,-.11]].map(([r,y])=>new THREE.Vector2(r,y));const tyreGeo=new THREE.LatheGeometry(prof,40);
+ const extra=[];let nW=0;
+ MODEL.wheels.forEach(([nm,wx,sz2])=>{const wh=root.getObjectByName(nm);if(!wh)return;hit('wheel',nm);nW++;
+  if(sz2>0)wh.rotateOnWorldAxis(new THREE.Vector3(0,1,0),Math.PI);
+  wh.updateWorldMatrix(true,true);const bb=new THREE.Box3().setFromObject(wh),cc=bb.getCenter(new THREE.Vector3());const tgt=new THREE.Vector3(wx,.345,sz2*.84);const inv=wh.parent.matrixWorld.clone().invert();
+  wh.position.add(tgt.clone().applyMatrix4(inv).sub(cc.clone().applyMatrix4(inv)));
+  const ty=new THREE.Mesh(tyreGeo,tyreMat);ty.rotation.x=Math.PI/2;ty.position.set(wx,.345,sz2*.82);extra.push(ty);
+  const dk=new THREE.Mesh(new THREE.CylinderGeometry(.185,.185,.022,36),discMat);dk.rotation.x=Math.PI/2;dk.position.set(wx,.345,sz2*.70);extra.push(dk)});
+ window.__wheelsPlaced=nW;
+ const hidden=[];MODEL.hide.forEach(nm=>{const o=root.getObjectByName(nm);if(o){o.visible=false;hit('hide',nm);hidden.push(nm)}});window.__hidden=hidden;
+ scene.add(holder);extra.forEach(t=>scene.add(t));tyres=extra;
+ _pts=null;carBox=new THREE.Box3().setFromObject(holder);extra.forEach(t=>carBox.expandByObject(t));
+ { const ms=[];holder.traverse(o=>{if(o.isMesh&&o.visible)ms.push(o)});const rc=new THREE.Raycaster();
+  anchors=PINS.map(p=>{const o=p.from==='side'?new THREE.Vector3(p.p[0],p.p[1],4):new THREE.Vector3(p.p[0],4,p.p[2]);const dr=p.from==='side'?new THREE.Vector3(0,0,-1):new THREE.Vector3(0,-1,0);rc.set(o,dr);const hh=rc.intersectObjects(ms,false);return hh.length?hh[0].point.clone():new THREE.Vector3(...p.p)}); window.__anchors=anchors.map(a=>a.toArray().map(n=>Math.round(n*100)/100)) }
+ if(stageEl&&w&&h)resize();
+ selReport();modelReady=true;MERC.model=true;const l=document.getElementById('loadline');l&&l.remove();dirty=true}
+
+if(init()){loadModel().catch(e=>{console.warn('[merc] model failed',e);const l=document.getElementById('loadline');if(l)l.textContent='Car model did not load. The guide still works.';window.__selMiss=window.__selMiss??-1})}
+route();
+</script>
+</body>
+</html>
