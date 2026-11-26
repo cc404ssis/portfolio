@@ -348,7 +348,7 @@ function faultView(k){
  <div class="nx"><span class="lab">Next check</span><p style="margin-top:4px">${esc(f.next)}</p></div>
  <p class="foot"><a href="#/" class="btn">All 7 problems</a></p>
  </article>`}
-function countUp(){const c=document.getElementById('cnt');if(!c||matchMedia('(prefers-reduced-motion: reduce)').matches)return;const to=+c.dataset.to,t0=performance.now();c.textContent='0';(function f(n){const k=Math.min(1,(n-t0)/700);c.textContent=String(Math.round(to*(1-Math.pow(1-k,3))));if(k<1)requestAnimationFrame(f)})(t0)}
+function countUp(){const c=document.getElementById('cnt');if(!c||matchMedia('(prefers-reduced-motion: reduce)').matches)return;const to=+c.dataset.to,t0=performance.now();c.textContent='0';(function f(n){const k=Math.max(0,Math.min(1,(n-t0)/700));c.textContent=String(Math.round(to*(1-Math.pow(1-k,3))));if(k<1)requestAnimationFrame(f)})(t0)}
 function route(){
  const h=location.hash.replace(/^#\/?/,'');
  const v=$('#view');
