@@ -211,6 +211,12 @@ h1{font:800 clamp(30px,9vw,48px)/.98 var(--disp);letter-spacing:-.005em;text-tra
  .page[data-mf] .stage[data-failed]{min-height:0}
  .page[data-mf] .stage[data-failed] #loadline{min-height:0;padding:14px 16px}
 }
+/* round 3 */
+.rows .go{font-size:14px;letter-spacing:0;text-transform:none}
+html[data-mf] .reply .btn.acc{background:none;border-color:var(--pink);color:var(--pink);font-weight:600}
+.stage[data-failed],.stage[data-failed] #loadline{min-height:0}
+.stage[data-failed] #loadline{padding:14px 16px 12px}
+.fstrip .nxt{margin-top:10px;padding-top:10px;border-top:1px solid var(--hl)}
 </style>
 <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.187.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.187.0/examples/jsm/"}}</script>
 </head>
@@ -504,7 +510,7 @@ function faultView(k){
  <div class="stagecol fs"><div class="stage" id="stage" data-fault="${k}" aria-label="3D car, the pulsing dot marks where this problem is">
   <svg class="leads" id="leads" aria-hidden="true"></svg>
   <div id="loadline">Loading the car model...</div>
- </div><p class="legend"><span><i style="background:var(--red)"></i>This problem</span><span><i style="background:#7d8a92"></i>The other six areas</span><span><i style="box-shadow:inset 0 0 0 2px var(--red)"></i>Behind the car</span></p><p class="fine credit">Stand-in W220 model (Mercedes-Benz S600 W220 2005 by Merc_TV, CC BY 4.0), not your S 320 L.</p><div class="fstrip" aria-label="This fault"><span class="lab">This fault</span><p>${esc(f.where)}</p><p class="prog" data-prog2></p><div class="bar2" aria-hidden="true"><i data-bar></i></div></div></div>
+ </div><p class="legend"><span><i style="background:var(--red)"></i>This problem</span><span><i style="background:#7d8a92"></i>The other six areas</span><span><i style="box-shadow:inset 0 0 0 2px var(--red)"></i>Behind the car</span></p><p class="fine credit">Stand-in W220 model (Mercedes-Benz S600 W220 2005 by Merc_TV, CC BY 4.0), not your S 320 L.</p><div class="fstrip" aria-label="This fault"><span class="lab">This fault</span><p>${esc(f.where)}</p><p class="prog" data-prog2></p><div class="bar2" aria-hidden="true"><i data-bar></i></div><div class="nxt"><span class="lab">Do this first</span><p>${esc(f.next)}</p></div></div></div>
  ${slipView(k)}
  <p class="where"><span class="lab">Where it is</span><br>${esc(f.where)}</p>
  <figure class="diag" style="margin:16px 0">${dg}<figcaption>Drawn diagram. ${esc(f.diag.cap)}</figcaption></figure>
@@ -530,7 +536,7 @@ window.MERC=window.MERC||{pending:null,stageOn(){},attach(el,fid){this.pending=[
 function stageFail(why){window.__mfail=why||window.__mfail||'The car model did not load.';const st=document.getElementById('stage');if(!st)return;
  let l=document.getElementById('loadline');if(!l){l=document.createElement('div');l.id='loadline';st.appendChild(l)}
  const wh=document.querySelector('.where');const where=wh?wh.textContent.replace(/^Where it is\s*/,''):'';
- l.className='fail';st.dataset.failed='1';st.style.height='';
+ document.documentElement.dataset.mf='1';l.className='fail';st.dataset.failed='1';st.style.height='';
  const pg=st.closest('.page'),sc=st.closest('.stagecol');if(sc)sc.dataset.failed='1';if(pg&&wh){pg.dataset.mf='1';pg.querySelector('h1').after(wh)}
  l.innerHTML='<b>Car model did not load</b><span>'+esc(window.__mfail)+' The guide below still works.</span>'+'<button class="btn" type="button" id="retry">Reload the model</button>';
  document.getElementById('retry').addEventListener('click',()=>location.reload())}
