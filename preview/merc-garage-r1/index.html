@@ -183,6 +183,34 @@ h1{font:800 clamp(30px,9vw,48px)/.98 var(--disp);letter-spacing:-.005em;text-tra
  .page>*{grid-column:2;min-width:0}
  .page>.stagecol{grid-column:1;grid-row:1/span 60;position:sticky;top:12px;margin-top:8px}
 }
+
+/* garage-r1 round 2: garage-sized working text, fault strip, failed-state layout, border contrast */
+.crow,.slip .sh,.slip .quo,.note,.msg,.reply .ph,.rows small,.rows .sc,.rows .cr,table,td,td.c,.pn,.fine,.prog,.legend,.diag figcaption,.reply input[type=file],#loadline,.bar,.btn,.reply .pick{font-size:14px}
+.lab,th{font-size:12px}
+.btn,.btn.back{border-color:#66747d}
+.btn.txt{border-color:transparent}
+.reply .btn{border-color:var(--pink)}
+.reply .btn.acc{border-color:var(--share)}
+.btn.pri{border-color:var(--sil)}
+.fstrip{display:none}
+@media(min-width:1024px) and (orientation:landscape){
+ .page:not([data-mf])>.where{display:none}
+ .fstrip{display:block;margin-top:12px;padding:12px 14px;background:var(--pl);border:1px solid var(--hl);border-radius:6px}
+ .stagecol[data-failed] .fstrip{display:none}
+ .fstrip p{margin-top:4px}
+ .fstrip .bar2{height:4px;margin-top:8px;border-radius:2px;background:var(--hl);overflow:hidden}
+ .fstrip .bar2 i{display:block;height:100%;width:0;background:var(--go)}
+}
+#retry{background:var(--amb);border-color:var(--amb);color:#14110a;font-weight:700}
+.stagecol[data-failed] .legend,.stagecol[data-failed] .bar{display:none}
+.page[data-mf]>.where{margin:12px 0 0}
+@media(min-width:1024px) and (orientation:landscape){
+ .page[data-mf]{display:block;max-width:820px;margin:0 auto}
+ .page[data-mf]>.where{margin:12px 0 4px}
+ .page[data-mf]>.stagecol{position:static;margin-top:12px}
+ .page[data-mf] .stage[data-failed]{min-height:0}
+ .page[data-mf] .stage[data-failed] #loadline{min-height:0;padding:14px 16px}
+}
 </style>
 <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.187.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.187.0/examples/jsm/"}}</script>
 </head>
@@ -476,7 +504,7 @@ function faultView(k){
  <div class="stagecol fs"><div class="stage" id="stage" data-fault="${k}" aria-label="3D car, the pulsing dot marks where this problem is">
   <svg class="leads" id="leads" aria-hidden="true"></svg>
   <div id="loadline">Loading the car model...</div>
- </div><p class="legend"><span><i style="background:var(--red)"></i>This problem</span><span><i style="background:#7d8a92"></i>The other six areas</span><span><i style="box-shadow:inset 0 0 0 2px var(--red)"></i>Behind the car</span></p><p class="fine credit">Stand-in W220 model (Mercedes-Benz S600 W220 2005 by Merc_TV, CC BY 4.0), not your S 320 L.</p></div>
+ </div><p class="legend"><span><i style="background:var(--red)"></i>This problem</span><span><i style="background:#7d8a92"></i>The other six areas</span><span><i style="box-shadow:inset 0 0 0 2px var(--red)"></i>Behind the car</span></p><p class="fine credit">Stand-in W220 model (Mercedes-Benz S600 W220 2005 by Merc_TV, CC BY 4.0), not your S 320 L.</p><div class="fstrip" aria-label="This fault"><span class="lab">This fault</span><p>${esc(f.where)}</p><p class="prog" data-prog2></p><div class="bar2" aria-hidden="true"><i data-bar></i></div></div></div>
  ${slipView(k)}
  <p class="where"><span class="lab">Where it is</span><br>${esc(f.where)}</p>
  <figure class="diag" style="margin:16px 0">${dg}<figcaption>Drawn diagram. ${esc(f.diag.cap)}</figcaption></figure>
@@ -503,7 +531,8 @@ function stageFail(why){window.__mfail=why||window.__mfail||'The car model did n
  let l=document.getElementById('loadline');if(!l){l=document.createElement('div');l.id='loadline';st.appendChild(l)}
  const wh=document.querySelector('.where');const where=wh?wh.textContent.replace(/^Where it is\s*/,''):'';
  l.className='fail';st.dataset.failed='1';st.style.height='';
- l.innerHTML='<b>Car model did not load</b><span>'+esc(window.__mfail)+' The guide below still works.</span>'+(where?'<span>Where it is: '+esc(where)+'</span>':'')+'<button class="btn" type="button" id="retry">Reload the model</button>';
+ const pg=st.closest('.page'),sc=st.closest('.stagecol');if(sc)sc.dataset.failed='1';if(pg&&wh){pg.dataset.mf='1';pg.querySelector('h1').after(wh)}
+ l.innerHTML='<b>Car model did not load</b><span>'+esc(window.__mfail)+' The guide below still works.</span>'+'<button class="btn" type="button" id="retry">Reload the model</button>';
  document.getElementById('retry').addEventListener('click',()=>location.reload())}
 window.stageFail=stageFail;
 function route(){
@@ -539,7 +568,7 @@ function wireReply(k){
  paint()}
 function wireFault(){
  const ticks=[...document.querySelectorAll('.tk input')];
- const upd=()=>{$('[data-prog]').textContent=ticks.filter(t=>t.checked).length+' of '+ticks.length+' checked'};
+ const upd=()=>{const n=ticks.filter(t=>t.checked).length,txt=n+' of '+ticks.length+' checked';$('[data-prog]').textContent=txt;const p2=$('[data-prog2]');if(p2)p2.textContent=txt;const b=$('[data-bar]');if(b)b.style.width=Math.round(100*n/ticks.length)+'%'};
  ticks.forEach(t=>{t.checked=store.get(t.dataset.k)==='1';t.addEventListener('change',()=>{store.set(t.dataset.k,t.checked?'1':'0');upd()})});upd();
  wireReply($('.page').dataset.page);
  $('#back').addEventListener('click',()=>{if(navCount>0)history.back();else location.hash='#/'});
